@@ -5,7 +5,10 @@
       "Bash(npm install:*)",
       "Bash(npx plugins:*)",
       "WebFetch(domain:www.instagram.com)",
-      "Bash(git config:*)"
+      "Bash(git config:*)",
+      "WebFetch(domain:conexstudio.com.br)",
+      "Bash(cp \"F:/CONEX/CONEX MATERIAIS/LOGO_CONEX__INSTA_FUNDOESCURO.png\" \"C:/Users/ruben/conex-dashboard/public/logo-cnx.png\")",
+      "Bash(cp \"F:/CONEX/CONEX MATERIAIS/PNG LOGO/LOGO_CONEX_BRANCA.png\" \"C:/Users/ruben/conex-dashboard/public/logo-conex-branca.png\")"
     ]
   }
 }

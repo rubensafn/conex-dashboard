@@ -1,36 +1,43 @@
 import { useState, useMemo, useRef, useEffect } from "react";
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from "recharts";
 
+/* ─── TOKENS ─── */
 const C = {
-  accent:"#B8F500", bg:"#080808", surface:"#0F0F0F", card:"#141414",
-  border:"#1C1C1C", borderHi:"#252525", text1:"#F0F0F0", text2:"#666", text3:"#333", danger:"#FF4444",
+  accent:"#B8F500", accentDim:"#B8F50018",
+  bg:"#060606", surface:"#0D0D0D", card:"#111111", cardHi:"#161616",
+  border:"#1A1A1A", borderHi:"#242424",
+  text1:"#F2F2F2", text2:"#5A5A5A", text3:"#2E2E2E",
+  danger:"#FF4444", warn:"#F59E0B", info:"#60A5FA", success:"#4ADE80",
+  font: "'Nunito', sans-serif",
+  fontBody: "'Nunito Sans', sans-serif",
 };
 
+/* ─── STATUSES ─── */
 const STATUSES = [
-  {id:"backlog",    label:"Backlog",           color:"#444",    bg:"#161616", icon:"○"},
-  {id:"briefing",   label:"Briefing",          color:"#818CF8", bg:"#16163A", icon:"📋"},
-  {id:"planejando", label:"Planejando",        color:"#60A5FA", bg:"#0D1A2E", icon:"🗂"},
-  {id:"andamento",  label:"Em andamento",      color:"#B8F500", bg:"#1A2200", icon:"⚡"},
-  {id:"producao",   label:"Em produção",       color:"#F59E0B", bg:"#1F1400", icon:"🎨"},
-  {id:"revisao",    label:"Em revisão",        color:"#F97316", bg:"#1F0E00", icon:"👁"},
-  {id:"aprovacao",  label:"Aguard. aprovação", color:"#C084FC", bg:"#1A0A2E", icon:"⏳"},
-  {id:"ajustes",    label:"Ajustes",           color:"#FB7185", bg:"#2A0A12", icon:"✏️"},
-  {id:"concluido",  label:"Concluído",         color:"#4ADE80", bg:"#0A1F0A", icon:"✓"},
-  {id:"pausado",    label:"Pausado",           color:"#94A3B8", bg:"#141414", icon:"⏸"},
-  {id:"cancelado",  label:"Cancelado",         color:"#FF4444", bg:"#1A0505", icon:"✕"},
+  {id:"backlog",    label:"Backlog",           color:"#3A3A3A", bg:"#111",    icon:"○"},
+  {id:"briefing",   label:"Briefing",          color:"#818CF8", bg:"#13133A", icon:"📋"},
+  {id:"planejando", label:"Planejando",        color:"#60A5FA", bg:"#0A1628", icon:"🗂"},
+  {id:"andamento",  label:"Em andamento",      color:"#B8F500", bg:"#141A00", icon:"⚡"},
+  {id:"producao",   label:"Em produção",       color:"#F59E0B", bg:"#1A1000", icon:"🎨"},
+  {id:"revisao",    label:"Em revisão",        color:"#F97316", bg:"#1A0C00", icon:"👁"},
+  {id:"aprovacao",  label:"Ag. aprovação",     color:"#C084FC", bg:"#160828", icon:"⏳"},
+  {id:"ajustes",    label:"Ajustes",           color:"#FB7185", bg:"#220810", icon:"✏️"},
+  {id:"concluido",  label:"Concluído",         color:"#4ADE80", bg:"#081A08", icon:"✓"},
+  {id:"pausado",    label:"Pausado",           color:"#666",    bg:"#111",    icon:"⏸"},
+  {id:"cancelado",  label:"Cancelado",         color:"#FF4444", bg:"#1A0404", icon:"✕"},
 ];
 
 const PRIORITY = [
-  {id:"urgente", label:"Urgente", color:"#FF4444", bg:"#2A0505", icon:"🔴"},
-  {id:"normal",  label:"Normal",  color:"#B8F500", bg:"#1A2200", icon:"🟡"},
-  {id:"baixa",   label:"Baixa",   color:"#555",    bg:"#161616", icon:"⚪"},
+  {id:"urgente", label:"Urgente", color:"#FF4444", bg:"#220404", icon:"🔴"},
+  {id:"normal",  label:"Normal",  color:"#B8F500", bg:"#141A00", icon:"🟡"},
+  {id:"baixa",   label:"Baixa",   color:"#444",    bg:"#111",    icon:"⚪"},
 ];
 
 const CONTENT_STATUS = [
-  {id:"ideia",     label:"Ideia",     color:"#666",    bg:"#161616"},
-  {id:"rascunho",  label:"Rascunho",  color:"#60A5FA", bg:"#0D1A2E"},
-  {id:"agendado",  label:"Agendado",  color:"#B8F500", bg:"#1A2200"},
-  {id:"publicado", label:"Publicado", color:"#4ADE80", bg:"#0A1F0A"},
+  {id:"ideia",     label:"Ideia",     color:"#555",    bg:"#111"},
+  {id:"rascunho",  label:"Rascunho",  color:"#60A5FA", bg:"#0A1628"},
+  {id:"agendado",  label:"Agendado",  color:"#B8F500", bg:"#141A00"},
+  {id:"publicado", label:"Publicado", color:"#4ADE80", bg:"#081A08"},
 ];
 
 const PLATFORMS = [
@@ -40,21 +47,22 @@ const PLATFORMS = [
   {id:"linkedin",  label:"LinkedIn",  color:"#0A66C2"},
 ];
 
+/* ─── CHART DATA ─── */
 const revenueData = [
   {m:"Out",v:18},{m:"Nov",v:24},{m:"Dez",v:19},{m:"Jan",v:31},{m:"Fev",v:28},{m:"Mar",v:38},
 ];
 const taskData = [
-  {m:"Out",concluidas:12,abertas:5},{m:"Nov",concluidas:18,abertas:8},
-  {m:"Dez",concluidas:14,abertas:3},{m:"Jan",concluidas:22,abertas:9},
-  {m:"Fev",concluidas:19,abertas:6},{m:"Mar",concluidas:27,abertas:4},
+  {m:"Out",c:12,a:5},{m:"Nov",c:18,a:8},{m:"Dez",c:14,a:3},
+  {m:"Jan",c:22,a:9},{m:"Fev",c:19,a:6},{m:"Mar",c:27,a:4},
 ];
 const pieData = [
   {name:"Branding",value:35,color:"#B8F500"},
-  {name:"Social",value:25,color:"#60A5FA"},
-  {name:"Motion",value:20,color:"#C084FC"},
-  {name:"Web",value:20,color:"#F59E0B"},
+  {name:"Social",  value:25,color:"#60A5FA"},
+  {name:"Motion",  value:20,color:"#C084FC"},
+  {name:"Web",     value:20,color:"#F59E0B"},
 ];
 
+/* ─── INITIAL DATA ─── */
 let nPid=6, nTid=8, nCid=6;
 
 const iProjects = [
@@ -86,35 +94,35 @@ const iContent = [
 const getSt = id => STATUSES.find(s=>s.id===id)||STATUSES[0];
 const getPl = id => PLATFORMS.find(p=>p.id===id)||PLATFORMS[0];
 
-/* ── PIP DROPDOWN ── */
-function Pip({value, onChange, options}){
-  const [open,setOpen] = useState(false);
-  const ref = useRef();
-  const cur = options.find(o=>o.id===value)||options[0];
+/* ─── PIP DROPDOWN ─── */
+function Pip({value,onChange,options}){
+  const [open,setOpen]=useState(false);
+  const ref=useRef();
+  const cur=options.find(o=>o.id===value)||options[0];
   useEffect(()=>{
-    if(!open) return;
-    const fn = e=>{ if(ref.current&&!ref.current.contains(e.target)) setOpen(false); };
+    if(!open)return;
+    const fn=e=>{if(ref.current&&!ref.current.contains(e.target))setOpen(false);};
     document.addEventListener("mousedown",fn);
-    return ()=>document.removeEventListener("mousedown",fn);
+    return()=>document.removeEventListener("mousedown",fn);
   },[open]);
   return(
     <div ref={ref} style={{position:"relative",display:"inline-block"}}>
       <button onClick={e=>{e.stopPropagation();setOpen(o=>!o)}}
-        style={{background:cur.bg,color:cur.color,border:`1px solid ${cur.color}30`,cursor:"pointer",whiteSpace:"nowrap",display:"inline-flex",alignItems:"center",gap:4,padding:"3px 8px",borderRadius:6,fontSize:11,fontWeight:600}}>
-        {cur.icon&&<span style={{fontSize:9}}>{cur.icon}</span>}
+        style={{background:cur.bg,color:cur.color,border:`1px solid ${cur.color}28`,cursor:"pointer",whiteSpace:"nowrap",display:"inline-flex",alignItems:"center",gap:5,padding:"4px 10px",borderRadius:8,fontSize:11,fontWeight:700,fontFamily:C.font,letterSpacing:"0.01em",transition:"opacity 0.1s"}}>
+        {cur.icon&&<span style={{fontSize:10}}>{cur.icon}</span>}
         <span>{cur.label}</span>
-        <span style={{opacity:0.4,fontSize:8}}>▾</span>
+        <span style={{opacity:0.35,fontSize:8,marginLeft:2}}>▾</span>
       </button>
       {open&&(
-        <div style={{position:"absolute",left:0,top:"calc(100% + 4px)",background:"#0C0C0C",border:`1px solid ${C.borderHi}`,boxShadow:"0 16px 48px rgba(0,0,0,0.9)",zIndex:300,minWidth:175,borderRadius:12,padding:"6px 0",overflow:"hidden"}}>
+        <div style={{position:"absolute",left:0,top:"calc(100% + 6px)",background:"#0A0A0A",border:`1px solid ${C.borderHi}`,boxShadow:"0 20px 60px rgba(0,0,0,0.95)",zIndex:400,minWidth:180,borderRadius:14,padding:"6px 0",overflow:"hidden"}}>
           {options.map(o=>{
             const active=o.id===value;
             return(
               <button key={o.id} onClick={e=>{e.stopPropagation();onChange(o.id);setOpen(false);}}
-                style={{color:active?o.color:C.text2,background:active?`${o.color}12`:"transparent",width:"100%",display:"flex",alignItems:"center",gap:8,padding:"7px 12px",fontSize:12,textAlign:"left",border:"none",cursor:"pointer"}}>
-                {o.icon&&<span>{o.icon}</span>}
+                style={{color:active?o.color:C.text2,background:active?`${o.color}10`:"transparent",width:"100%",display:"flex",alignItems:"center",gap:10,padding:"8px 14px",fontSize:12,fontFamily:C.font,fontWeight:active?700:500,textAlign:"left",border:"none",cursor:"pointer",transition:"background 0.1s"}}>
+                {o.icon&&<span style={{fontSize:12}}>{o.icon}</span>}
                 <span>{o.label}</span>
-                {active&&<span style={{color:o.color,marginLeft:"auto"}}>✓</span>}
+                {active&&<span style={{color:o.color,marginLeft:"auto",fontSize:10}}>✓</span>}
               </button>
             );
           })}
@@ -124,18 +132,20 @@ function Pip({value, onChange, options}){
   );
 }
 
-/* ── STAT CARD ── */
+/* ─── STAT CARD ─── */
 function StatCard({label,value,accent,chart}){
   return(
-    <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:16,padding:20,position:"relative",overflow:"hidden",minHeight:110}}>
-      <div style={{color:C.text2,fontSize:11,letterSpacing:"0.1em",fontFamily:"Space Grotesk,sans-serif",marginBottom:6,textTransform:"uppercase"}}>{label}</div>
-      <div style={{color:accent||C.text1,fontFamily:"Space Grotesk,sans-serif",fontSize:30,fontWeight:900,lineHeight:1}}>{value}</div>
+    <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:18,padding:22,position:"relative",overflow:"hidden",minHeight:115,transition:"border-color 0.2s"}}
+      onMouseEnter={e=>e.currentTarget.style.borderColor=C.borderHi}
+      onMouseLeave={e=>e.currentTarget.style.borderColor=C.border}>
+      <div style={{color:C.text2,fontSize:10,letterSpacing:"0.12em",fontFamily:C.font,marginBottom:8,textTransform:"uppercase",fontWeight:700}}>{label}</div>
+      <div style={{color:accent||C.text1,fontFamily:C.font,fontSize:32,fontWeight:900,lineHeight:1,letterSpacing:"-0.02em"}}>{value}</div>
       {chart&&(
-        <div style={{position:"absolute",bottom:0,right:0,left:0,height:50,opacity:0.35}}>
+        <div style={{position:"absolute",bottom:0,right:0,left:0,height:52,opacity:0.3}}>
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={revenueData} margin={{top:0,right:0,bottom:0,left:0}}>
               <defs><linearGradient id={`g${label}`} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor={accent||C.accent} stopOpacity={0.5}/>
+                <stop offset="0%" stopColor={accent||C.accent} stopOpacity={0.6}/>
                 <stop offset="100%" stopColor={accent||C.accent} stopOpacity={0}/>
               </linearGradient></defs>
               <Area type="monotone" dataKey="v" stroke={accent||C.accent} strokeWidth={1.5} fill={`url(#g${label})`} dot={false}/>
@@ -143,32 +153,32 @@ function StatCard({label,value,accent,chart}){
           </ResponsiveContainer>
         </div>
       )}
-      <div style={{position:"absolute",top:-20,right:-20,width:80,height:80,background:`radial-gradient(circle,${accent||C.accent}10 0%,transparent 70%)`}}/>
+      <div style={{position:"absolute",top:-24,right:-24,width:90,height:90,background:`radial-gradient(circle,${accent||C.accent}12 0%,transparent 70%)`}}/>
     </div>
   );
 }
 
-const CustomTooltip = ({active,payload,label})=>{
-  if(!active||!payload?.length) return null;
+const CustomTooltip=({active,payload,label})=>{
+  if(!active||!payload?.length)return null;
   return(
-    <div style={{background:"#0C0C0C",border:`1px solid ${C.borderHi}`,borderRadius:10,padding:"8px 12px",fontSize:12}}>
-      <div style={{color:C.text2,marginBottom:4}}>{label}</div>
+    <div style={{background:"#0A0A0A",border:`1px solid ${C.borderHi}`,borderRadius:12,padding:"10px 14px",fontSize:12,fontFamily:C.font}}>
+      <div style={{color:C.text2,marginBottom:6,fontWeight:600}}>{label}</div>
       {payload.map((p,i)=>(
-        <div key={i} style={{color:p.color,fontFamily:"Space Grotesk,sans-serif",fontWeight:700}}>{p.name}: {p.value}</div>
+        <div key={i} style={{color:p.color,fontWeight:800}}>{p.name}: {p.value}</div>
       ))}
     </div>
   );
 };
 
-/* ── MODAL ── */
+/* ─── MODAL ─── */
 function Modal({title,onClose,children}){
   return(
     <div onClick={e=>{if(e.target===e.currentTarget)onClose();}}
-      style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.85)",zIndex:500,display:"flex",alignItems:"center",justifyContent:"center",padding:24}}>
-      <div style={{background:C.surface,border:`1px solid ${C.borderHi}`,borderRadius:20,padding:28,width:"100%",maxWidth:460,maxHeight:"85vh",overflowY:"auto"}}>
-        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:24}}>
-          <div style={{fontFamily:"Space Grotesk,sans-serif",color:C.text1,fontSize:16,fontWeight:800}}>{title}</div>
-          <button onClick={onClose} style={{color:C.text3,background:"none",border:"none",cursor:"pointer",fontSize:16}}>✕</button>
+      style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.88)",zIndex:500,display:"flex",alignItems:"center",justifyContent:"center",padding:24,backdropFilter:"blur(4px)"}}>
+      <div style={{background:C.surface,border:`1px solid ${C.borderHi}`,borderRadius:22,padding:30,width:"100%",maxWidth:480,maxHeight:"88vh",overflowY:"auto",boxShadow:"0 40px 120px rgba(0,0,0,0.8)"}}>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:26}}>
+          <div style={{fontFamily:C.font,color:C.text1,fontSize:17,fontWeight:900,letterSpacing:"-0.02em"}}>{title}</div>
+          <button onClick={onClose} style={{color:C.text3,background:C.card,border:`1px solid ${C.border}`,cursor:"pointer",fontSize:13,width:30,height:30,borderRadius:8,display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
         </div>
         {children}
       </div>
@@ -176,61 +186,130 @@ function Modal({title,onClose,children}){
   );
 }
 
-const inputSt = {
-  width:"100%",background:C.card,border:`1px solid ${C.border}`,borderRadius:10,
-  padding:"10px 12px",color:C.text1,fontSize:13,outline:"none",
-  boxSizing:"border-box",fontFamily:"Inter,sans-serif",
+const inputSt={
+  width:"100%",background:C.card,border:`1px solid ${C.border}`,borderRadius:12,
+  padding:"11px 14px",color:C.text1,fontSize:13,outline:"none",
+  boxSizing:"border-box",fontFamily:C.fontBody,transition:"border-color 0.15s",
 };
 
 function Field({label,children}){
   return(
-    <div style={{marginBottom:16}}>
-      <div style={{color:C.text2,fontSize:11,letterSpacing:"0.08em",marginBottom:6,textTransform:"uppercase"}}>{label}</div>
+    <div style={{marginBottom:18}}>
+      <div style={{color:C.text2,fontSize:10,letterSpacing:"0.1em",marginBottom:7,textTransform:"uppercase",fontFamily:C.font,fontWeight:700}}>{label}</div>
       {children}
     </div>
   );
 }
 
-/* ── KANBAN BOARD (all statuses + drag & drop) ── */
-function KanbanBoard({items,onStatusChange,onPriorityChange,renderCard,onAdd,addLabel}){
-  const [draggingId,setDraggingId] = useState(null);
-  const [overColId, setOverColId]  = useState(null);
+/* ─── PROJECT CARD (com tarefas inline) ─── */
+function ProjectCard({project,tasks,onProjStatus,onProjPriority,onTaskToggle,onAddTask}){
+  const projTasks=tasks.filter(t=>t.projectId===project.id);
+  const done=projTasks.filter(t=>t.status==="concluido").length;
+  const pct=projTasks.length?Math.round(done/projTasks.length*100):0;
+  const st=getSt(project.status);
+
+  return(
+    <div style={{background:C.surface,border:`1px solid ${C.border}`,borderRadius:18,padding:16,transition:"box-shadow 0.2s,border-color 0.2s",cursor:"default"}}
+      onMouseEnter={e=>{e.currentTarget.style.boxShadow=`0 0 0 1px ${C.borderHi},0 12px 32px rgba(0,0,0,0.6)`;e.currentTarget.style.borderColor=C.borderHi;}}
+      onMouseLeave={e=>{e.currentTarget.style.boxShadow="none";e.currentTarget.style.borderColor=C.border;}}>
+
+      {/* Header */}
+      <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:8,marginBottom:4}}>
+        <div style={{flex:1,minWidth:0}}>
+          <div style={{color:C.text1,fontFamily:C.font,fontSize:14,fontWeight:800,lineHeight:1.3,marginBottom:4}}>{project.name}</div>
+          <div style={{color:C.text2,fontSize:11,fontFamily:C.fontBody}}>{project.client} · {project.deadline}</div>
+        </div>
+        <Pip value={project.priority} onChange={v=>onProjPriority(project.id,v)} options={PRIORITY}/>
+      </div>
+
+      {/* Status */}
+      <div style={{marginTop:10,marginBottom:14}}>
+        <Pip value={project.status} onChange={v=>onProjStatus(project.id,v)} options={STATUSES}/>
+      </div>
+
+      {/* Progress bar */}
+      {projTasks.length>0&&(
+        <div style={{marginBottom:12}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:5}}>
+            <span style={{color:C.text3,fontSize:10,fontFamily:C.font,fontWeight:700,letterSpacing:"0.08em",textTransform:"uppercase"}}>Tarefas</span>
+            <span style={{color:pct===100?C.success:C.text3,fontSize:10,fontFamily:C.font,fontWeight:700}}>{done}/{projTasks.length}</span>
+          </div>
+          <div style={{height:3,background:C.border,borderRadius:99,overflow:"hidden"}}>
+            <div style={{height:"100%",width:`${pct}%`,background:pct===100?C.success:C.accent,borderRadius:99,transition:"width 0.3s"}}/>
+          </div>
+        </div>
+      )}
+
+      {/* Tasks */}
+      <div style={{display:"flex",flexDirection:"column",gap:2}}>
+        {projTasks.map(task=>{
+          const done=task.status==="concluido";
+          return(
+            <div key={task.id} style={{display:"flex",alignItems:"center",gap:8,padding:"4px 6px",borderRadius:8,transition:"background 0.1s",cursor:"default"}}
+              onMouseEnter={e=>e.currentTarget.style.background=C.card}
+              onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+              <button onClick={()=>onTaskToggle(task.id)}
+                style={{width:16,height:16,borderRadius:5,border:`1.5px solid ${done?C.success:C.border}`,background:done?C.success:C.card,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",flexShrink:0,transition:"all 0.15s"}}>
+                {done&&<span style={{color:"#080808",fontSize:9,fontWeight:900,lineHeight:1}}>✓</span>}
+              </button>
+              <span style={{color:done?C.text3:C.text2,fontSize:12,fontFamily:C.fontBody,flex:1,textDecoration:done?"line-through":"none",transition:"color 0.15s"}}>{task.title}</span>
+              {task.assignee&&<span style={{color:C.text3,fontSize:10,fontFamily:C.font,fontWeight:600,flexShrink:0}}>{task.assignee}</span>}
+            </div>
+          );
+        })}
+        <button onClick={()=>onAddTask(project.id)}
+          style={{display:"flex",alignItems:"center",gap:6,padding:"4px 6px",borderRadius:8,background:"transparent",border:"none",color:C.text3,fontSize:11,fontFamily:C.font,fontWeight:700,cursor:"pointer",textAlign:"left",transition:"color 0.15s"}}
+          onMouseEnter={e=>e.currentTarget.style.color=C.accent}
+          onMouseLeave={e=>e.currentTarget.style.color=C.text3}>
+          <span style={{fontSize:14,lineHeight:1}}>+</span> nova tarefa
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ─── PROJECT KANBAN ─── */
+function ProjectKanban({projects,tasks,onProjStatus,onProjPriority,onTaskToggle,onAddTask,onAddProject}){
+  const [draggingId,setDraggingId]=useState(null);
+  const [overColId, setOverColId] =useState(null);
 
   return(
     <div style={{display:"flex",gap:16,overflowX:"auto",paddingBottom:20,minHeight:400}}>
       {STATUSES.map(col=>{
-        const colItems = items.filter(i=>i.status===col.id);
-        const isOver   = overColId===col.id;
+        const colItems=projects.filter(p=>p.status===col.id);
+        const isOver=overColId===col.id;
         return(
           <div key={col.id}
-            style={{minWidth:260,maxWidth:280,flexShrink:0,borderRadius:16,border:isOver?`1px dashed ${col.color}55`:"1px solid transparent",background:isOver?`${col.color}06`:"transparent",transition:"all 0.15s",padding:4}}
+            style={{minWidth:272,maxWidth:290,flexShrink:0,borderRadius:18,border:isOver?`1px dashed ${col.color}55`:"1px solid transparent",background:isOver?`${col.color}05`:"transparent",transition:"all 0.15s",padding:4}}
             onDragOver={e=>{e.preventDefault();setOverColId(col.id);}}
             onDragLeave={e=>{if(!e.currentTarget.contains(e.relatedTarget))setOverColId(null);}}
-            onDrop={()=>{
-              if(draggingId!=null) onStatusChange(draggingId,col.id);
-              setOverColId(null); setDraggingId(null);
-            }}>
-            <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12,padding:"0 4px"}}>
-              <div style={{width:8,height:8,borderRadius:"50%",background:col.color,boxShadow:`0 0 6px ${col.color}`}}/>
-              <span style={{color:col.color,fontFamily:"Space Grotesk,sans-serif",fontSize:11,fontWeight:700,letterSpacing:"0.1em",textTransform:"uppercase"}}>{col.label}</span>
-              <span style={{background:C.border,color:C.text2,fontSize:11,fontFamily:"Space Grotesk,sans-serif",marginLeft:"auto",padding:"1px 8px",borderRadius:99,fontWeight:700}}>{colItems.length}</span>
+            onDrop={()=>{if(draggingId!=null)onProjStatus(draggingId,col.id);setOverColId(null);setDraggingId(null);}}>
+            {/* Column header */}
+            <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12,padding:"4px 4px 0"}}>
+              <div style={{width:7,height:7,borderRadius:"50%",background:col.color,boxShadow:`0 0 7px ${col.color}99`}}/>
+              <span style={{color:col.color,fontFamily:C.font,fontSize:10,fontWeight:800,letterSpacing:"0.12em",textTransform:"uppercase"}}>{col.label}</span>
+              <span style={{background:C.border,color:C.text2,fontSize:10,fontFamily:C.font,fontWeight:800,marginLeft:"auto",padding:"2px 8px",borderRadius:99}}>{colItems.length}</span>
             </div>
+            {/* Cards */}
             <div style={{display:"flex",flexDirection:"column",gap:10}}>
-              {colItems.map(item=>(
-                <div key={item.id}
+              {colItems.map(p=>(
+                <div key={p.id}
                   draggable
-                  onDragStart={()=>setDraggingId(item.id)}
+                  onDragStart={()=>setDraggingId(p.id)}
                   onDragEnd={()=>{setDraggingId(null);setOverColId(null);}}
-                  style={{opacity:draggingId===item.id?0.4:1,cursor:"grab",transition:"opacity 0.15s"}}>
-                  {renderCard(item,onStatusChange,onPriorityChange)}
+                  style={{opacity:draggingId===p.id?0.4:1,cursor:"grab",transition:"opacity 0.15s"}}>
+                  <ProjectCard
+                    project={p} tasks={tasks}
+                    onProjStatus={onProjStatus} onProjPriority={onProjPriority}
+                    onTaskToggle={onTaskToggle} onAddTask={onAddTask}/>
                 </div>
               ))}
               <button
-                onClick={()=>onAdd&&onAdd(col.id)}
-                style={{border:`1px dashed ${C.border}`,borderRadius:12,padding:10,textAlign:"center",color:C.text3,fontSize:12,cursor:"pointer",background:"transparent",width:"100%",transition:"all 0.15s"}}
+                onClick={()=>onAddProject(col.id)}
+                style={{border:`1px dashed ${C.border}`,borderRadius:14,padding:"10px 0",textAlign:"center",color:C.text3,fontSize:12,fontFamily:C.font,fontWeight:700,cursor:"pointer",background:"transparent",width:"100%",transition:"all 0.15s"}}
                 onMouseEnter={e=>{e.currentTarget.style.borderColor=col.color;e.currentTarget.style.color=col.color;}}
                 onMouseLeave={e=>{e.currentTarget.style.borderColor=C.border;e.currentTarget.style.color=C.text3;}}>
-                + {addLabel||"Adicionar"}
+                + Projeto
               </button>
             </div>
           </div>
@@ -240,50 +319,46 @@ function KanbanBoard({items,onStatusChange,onPriorityChange,renderCard,onAdd,add
   );
 }
 
-/* ── CONTENT MANAGER ── */
+/* ─── CONTENT MANAGER ─── */
 function ContentManager({content,onStatusChange,onAdd}){
-  const [filter,setFilter]     = useState("all");
-  const [draggingId,setDraggingId] = useState(null);
-  const [overColId, setOverColId]  = useState(null);
-
-  const filtered = filter==="all" ? content : content.filter(c=>c.platform===filter);
+  const [filter,setFilter]    =useState("all");
+  const [dragId,setDragId]    =useState(null);
+  const [overCol,setOverCol]  =useState(null);
+  const filtered=filter==="all"?content:content.filter(c=>c.platform===filter);
 
   return(
     <div>
-      <div style={{display:"flex",gap:8,marginBottom:20,flexWrap:"wrap",alignItems:"center"}}>
+      <div style={{display:"flex",gap:8,marginBottom:22,flexWrap:"wrap",alignItems:"center"}}>
         {["all",...PLATFORMS.map(p=>p.id)].map(pid=>{
-          const pl   = pid==="all" ? null : getPl(pid);
-          const active = filter===pid;
-          const color  = pl ? pl.color : C.accent;
+          const pl=pid==="all"?null:getPl(pid);
+          const active=filter===pid;
+          const color=pl?pl.color:C.accent;
           return(
             <button key={pid} onClick={()=>setFilter(pid)}
-              style={{padding:"6px 14px",borderRadius:8,fontSize:12,fontWeight:600,border:`1px solid ${active?color:C.border}`,background:active?`${color}18`:"transparent",color:active?color:C.text2,cursor:"pointer",fontFamily:"Space Grotesk,sans-serif",transition:"all 0.15s"}}>
-              {pid==="all" ? "Todos" : pl.label}
+              style={{padding:"6px 16px",borderRadius:10,fontSize:12,fontWeight:700,fontFamily:C.font,border:`1px solid ${active?color:C.border}`,background:active?`${color}18`:"transparent",color:active?color:C.text2,cursor:"pointer",transition:"all 0.15s"}}>
+              {pid==="all"?"Todos":pl.label}
             </button>
           );
         })}
         <button onClick={()=>onAdd("ideia")}
-          style={{marginLeft:"auto",padding:"6px 18px",borderRadius:8,fontSize:12,fontWeight:800,border:"none",background:C.accent,color:"#080808",cursor:"pointer",fontFamily:"Space Grotesk,sans-serif"}}>
+          style={{marginLeft:"auto",padding:"7px 20px",borderRadius:10,fontSize:12,fontWeight:800,fontFamily:C.font,border:"none",background:C.accent,color:"#060606",cursor:"pointer"}}>
           + Novo Conteúdo
         </button>
       </div>
       <div style={{display:"flex",gap:16,overflowX:"auto",paddingBottom:16}}>
         {CONTENT_STATUS.map(col=>{
-          const colItems = filtered.filter(c=>c.status===col.id);
-          const isOver   = overColId===col.id;
+          const colItems=filtered.filter(c=>c.status===col.id);
+          const isOver=overCol===col.id;
           return(
             <div key={col.id}
-              style={{minWidth:260,maxWidth:280,flexShrink:0,borderRadius:16,border:isOver?`1px dashed ${col.color}55`:"1px solid transparent",background:isOver?`${col.color}06`:"transparent",transition:"all 0.15s",padding:4}}
-              onDragOver={e=>{e.preventDefault();setOverColId(col.id);}}
-              onDragLeave={e=>{if(!e.currentTarget.contains(e.relatedTarget))setOverColId(null);}}
-              onDrop={()=>{
-                if(draggingId!=null) onStatusChange(draggingId,col.id);
-                setOverColId(null); setDraggingId(null);
-              }}>
+              style={{minWidth:268,maxWidth:286,flexShrink:0,borderRadius:18,border:isOver?`1px dashed ${col.color}55`:"1px solid transparent",background:isOver?`${col.color}05`:"transparent",transition:"all 0.15s",padding:4}}
+              onDragOver={e=>{e.preventDefault();setOverCol(col.id);}}
+              onDragLeave={e=>{if(!e.currentTarget.contains(e.relatedTarget))setOverCol(null);}}
+              onDrop={()=>{if(dragId!=null)onStatusChange(dragId,col.id);setOverCol(null);setDragId(null);}}>
               <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}>
-                <div style={{width:8,height:8,borderRadius:"50%",background:col.color,boxShadow:`0 0 6px ${col.color}`}}/>
-                <span style={{color:col.color,fontFamily:"Space Grotesk,sans-serif",fontSize:11,fontWeight:700,letterSpacing:"0.1em",textTransform:"uppercase"}}>{col.label}</span>
-                <span style={{background:C.border,color:C.text2,fontSize:11,fontFamily:"Space Grotesk,sans-serif",marginLeft:"auto",padding:"1px 8px",borderRadius:99,fontWeight:700}}>{colItems.length}</span>
+                <div style={{width:7,height:7,borderRadius:"50%",background:col.color,boxShadow:`0 0 7px ${col.color}99`}}/>
+                <span style={{color:col.color,fontFamily:C.font,fontSize:10,fontWeight:800,letterSpacing:"0.12em",textTransform:"uppercase"}}>{col.label}</span>
+                <span style={{background:C.border,color:C.text2,fontSize:10,fontFamily:C.font,fontWeight:800,marginLeft:"auto",padding:"2px 8px",borderRadius:99}}>{colItems.length}</span>
               </div>
               <div style={{display:"flex",flexDirection:"column",gap:10}}>
                 {colItems.map(item=>{
@@ -291,25 +366,24 @@ function ContentManager({content,onStatusChange,onAdd}){
                   return(
                     <div key={item.id}
                       draggable
-                      onDragStart={()=>setDraggingId(item.id)}
-                      onDragEnd={()=>{setDraggingId(null);setOverColId(null);}}
-                      style={{opacity:draggingId===item.id?0.4:1,cursor:"grab",background:C.surface,border:`1px solid ${C.border}`,borderRadius:14,padding:14,transition:"opacity 0.15s,box-shadow 0.2s,border-color 0.2s"}}
-                      onMouseEnter={e=>{e.currentTarget.style.boxShadow=`0 0 0 1px ${C.borderHi},0 8px 24px rgba(0,0,0,0.5)`;e.currentTarget.style.borderColor=C.borderHi;}}
+                      onDragStart={()=>setDragId(item.id)}
+                      onDragEnd={()=>{setDragId(null);setOverCol(null);}}
+                      style={{opacity:dragId===item.id?0.4:1,cursor:"grab",background:C.surface,border:`1px solid ${C.border}`,borderRadius:16,padding:14,transition:"opacity 0.15s,box-shadow 0.2s,border-color 0.2s"}}
+                      onMouseEnter={e=>{e.currentTarget.style.boxShadow=`0 0 0 1px ${C.borderHi},0 10px 28px rgba(0,0,0,0.5)`;e.currentTarget.style.borderColor=C.borderHi;}}
                       onMouseLeave={e=>{e.currentTarget.style.boxShadow="none";e.currentTarget.style.borderColor=C.border;}}>
                       <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:8}}>
-                        <span style={{background:`${pl.color}22`,color:pl.color,fontSize:10,fontWeight:700,padding:"2px 8px",borderRadius:6,fontFamily:"Space Grotesk,sans-serif"}}>{pl.label}</span>
-                        <span style={{color:C.text3,fontSize:10}}>{item.type}</span>
-                        {item.date&&<span style={{marginLeft:"auto",color:C.text3,fontSize:10}}>{item.date}</span>}
+                        <span style={{background:`${pl.color}20`,color:pl.color,fontSize:10,fontWeight:800,padding:"3px 9px",borderRadius:7,fontFamily:C.font}}>{pl.label}</span>
+                        <span style={{color:C.text3,fontSize:10,fontFamily:C.fontBody}}>{item.type}</span>
+                        {item.date&&<span style={{marginLeft:"auto",color:C.text3,fontSize:10,fontFamily:C.fontBody}}>{item.date}</span>}
                       </div>
-                      <div style={{color:C.text1,fontFamily:"Space Grotesk,sans-serif",fontSize:13,fontWeight:700,marginBottom:6,lineHeight:1.3}}>{item.title}</div>
-                      {item.caption&&<div style={{color:C.text3,fontSize:11,marginBottom:10,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.caption}</div>}
+                      <div style={{color:C.text1,fontFamily:C.font,fontSize:13,fontWeight:800,marginBottom:item.caption?6:10,lineHeight:1.3}}>{item.title}</div>
+                      {item.caption&&<div style={{color:C.text2,fontSize:11,fontFamily:C.fontBody,marginBottom:10,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.caption}</div>}
                       <Pip value={item.status} onChange={v=>onStatusChange(item.id,v)} options={CONTENT_STATUS}/>
                     </div>
                   );
                 })}
-                <button
-                  onClick={()=>onAdd(col.id)}
-                  style={{border:`1px dashed ${C.border}`,borderRadius:12,padding:10,textAlign:"center",color:C.text3,fontSize:12,cursor:"pointer",background:"transparent",width:"100%",transition:"all 0.15s"}}
+                <button onClick={()=>onAdd(col.id)}
+                  style={{border:`1px dashed ${C.border}`,borderRadius:14,padding:"10px 0",textAlign:"center",color:C.text3,fontSize:12,fontFamily:C.font,fontWeight:700,cursor:"pointer",background:"transparent",width:"100%",transition:"all 0.15s"}}
                   onMouseEnter={e=>{e.currentTarget.style.borderColor=col.color;e.currentTarget.style.color=col.color;}}
                   onMouseLeave={e=>{e.currentTarget.style.borderColor=C.border;e.currentTarget.style.color=C.text3;}}>
                   + Adicionar
@@ -323,54 +397,56 @@ function ContentManager({content,onStatusChange,onAdd}){
   );
 }
 
-/* ── CALENDAR ── */
+/* ─── CALENDAR ─── */
 function CalendarView({content}){
-  const [cur,setCur] = useState({year:2026,month:3});
-  const daysInMonth = new Date(cur.year,cur.month+1,0).getDate();
-  const firstDay    = new Date(cur.year,cur.month,1).getDay();
-  const monthName   = new Date(cur.year,cur.month,1).toLocaleString("pt-BR",{month:"long",year:"numeric"});
-  const prev = ()=>setCur(c=>c.month===0?{year:c.year-1,month:11}:{year:c.year,month:c.month-1});
-  const next = ()=>setCur(c=>c.month===11?{year:c.year+1,month:0}:{year:c.year,month:c.month+1});
-  const getDay = day=>{
+  const [cur,setCur]=useState({year:2026,month:3});
+  const daysInMonth=new Date(cur.year,cur.month+1,0).getDate();
+  const firstDay=new Date(cur.year,cur.month,1).getDay();
+  const monthName=new Date(cur.year,cur.month,1).toLocaleString("pt-BR",{month:"long",year:"numeric"});
+  const prev=()=>setCur(c=>c.month===0?{year:c.year-1,month:11}:{year:c.year,month:c.month-1});
+  const next=()=>setCur(c=>c.month===11?{year:c.year+1,month:0}:{year:c.year,month:c.month+1});
+  const getDay=day=>{
     const d=`${cur.year}-${String(cur.month+1).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
     return content.filter(c=>c.date===d);
   };
-  const weekDays=["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
+  const wd=["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
   return(
     <div>
-      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:20}}>
-        <div style={{fontFamily:"Space Grotesk,sans-serif",color:C.text1,fontSize:16,fontWeight:800,textTransform:"capitalize"}}>{monthName}</div>
-        <div style={{display:"flex",gap:8}}>
-          <button onClick={prev} style={{background:C.card,border:`1px solid ${C.border}`,color:C.text2,borderRadius:8,padding:"6px 14px",cursor:"pointer",fontSize:14}}>‹</button>
-          <button onClick={next} style={{background:C.card,border:`1px solid ${C.border}`,color:C.text2,borderRadius:8,padding:"6px 14px",cursor:"pointer",fontSize:14}}>›</button>
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:22}}>
+        <div style={{fontFamily:C.font,color:C.text1,fontSize:18,fontWeight:900,textTransform:"capitalize",letterSpacing:"-0.02em"}}>{monthName}</div>
+        <div style={{display:"flex",gap:6}}>
+          <button onClick={prev} style={{background:C.card,border:`1px solid ${C.border}`,color:C.text2,borderRadius:10,padding:"6px 14px",cursor:"pointer",fontSize:14,fontFamily:C.font,transition:"border-color 0.15s"}} onMouseEnter={e=>e.currentTarget.style.borderColor=C.borderHi} onMouseLeave={e=>e.currentTarget.style.borderColor=C.border}>‹</button>
+          <button onClick={next} style={{background:C.card,border:`1px solid ${C.border}`,color:C.text2,borderRadius:10,padding:"6px 14px",cursor:"pointer",fontSize:14,fontFamily:C.font,transition:"border-color 0.15s"}} onMouseEnter={e=>e.currentTarget.style.borderColor=C.borderHi} onMouseLeave={e=>e.currentTarget.style.borderColor=C.border}>›</button>
         </div>
       </div>
       <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",gap:4,marginBottom:4}}>
-        {weekDays.map(d=>(
-          <div key={d} style={{textAlign:"center",color:C.text3,fontSize:11,fontFamily:"Space Grotesk,sans-serif",fontWeight:700,padding:"8px 0"}}>{d}</div>
+        {wd.map(d=>(
+          <div key={d} style={{textAlign:"center",color:C.text3,fontSize:10,fontFamily:C.font,fontWeight:800,padding:"6px 0",letterSpacing:"0.08em"}}>{d}</div>
         ))}
       </div>
       <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",gap:4}}>
         {Array.from({length:firstDay}).map((_,i)=>(
-          <div key={`e${i}`} style={{minHeight:80,borderRadius:10,background:C.surface,opacity:0.2}}/>
+          <div key={`e${i}`} style={{minHeight:84,borderRadius:12,background:C.surface,opacity:0.15}}/>
         ))}
         {Array.from({length:daysInMonth}).map((_,i)=>{
           const day=i+1;
           const items=getDay(day);
           const isToday=cur.year===2026&&cur.month===2&&day===27;
           return(
-            <div key={day} style={{minHeight:80,borderRadius:10,background:C.card,border:`1px solid ${isToday?C.accent:C.border}`,padding:8}}>
-              <div style={{fontFamily:"Space Grotesk,sans-serif",fontSize:12,fontWeight:700,color:isToday?C.accent:C.text3,marginBottom:4}}>{day}</div>
+            <div key={day} style={{minHeight:84,borderRadius:12,background:C.card,border:`1px solid ${isToday?C.accent:C.border}`,padding:8,transition:"border-color 0.15s"}}
+              onMouseEnter={e=>{if(!isToday)e.currentTarget.style.borderColor=C.borderHi;}}
+              onMouseLeave={e=>{if(!isToday)e.currentTarget.style.borderColor=C.border;}}>
+              <div style={{fontFamily:C.font,fontSize:12,fontWeight:800,color:isToday?C.accent:C.text3,marginBottom:4}}>{day}</div>
               <div style={{display:"flex",flexDirection:"column",gap:2}}>
                 {items.slice(0,2).map(item=>{
                   const pl=getPl(item.platform);
                   return(
-                    <div key={item.id} style={{background:`${pl.color}22`,borderLeft:`2px solid ${pl.color}`,borderRadius:"0 4px 4px 0",padding:"2px 5px",fontSize:10,color:pl.color,fontWeight:600,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>
+                    <div key={item.id} style={{background:`${pl.color}20`,borderLeft:`2px solid ${pl.color}`,borderRadius:"0 5px 5px 0",padding:"2px 6px",fontSize:10,color:pl.color,fontWeight:700,fontFamily:C.font,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>
                       {item.title}
                     </div>
                   );
                 })}
-                {items.length>2&&<div style={{color:C.text3,fontSize:10}}>+{items.length-2}</div>}
+                {items.length>2&&<div style={{color:C.text3,fontSize:10,fontFamily:C.font,fontWeight:700}}>+{items.length-2}</div>}
               </div>
             </div>
           );
@@ -380,26 +456,26 @@ function CalendarView({content}){
   );
 }
 
-/* ── APP ── */
+/* ─── APP ─── */
 export default function App(){
-  const [view,     setView]     = useState("overview");
-  const [projects, setProjects] = useState(iProjects);
-  const [tasks,    setTasks]    = useState(iTasks);
-  const [content,  setContent]  = useState(iContent);
-  const [col,      setCol]      = useState(false);
-  const [modal,    setModal]    = useState(null);
-  const [form,     setForm]     = useState({});
+  const [view,     setView]     =useState("overview");
+  const [projects, setProjects] =useState(iProjects);
+  const [tasks,    setTasks]    =useState(iTasks);
+  const [content,  setContent]  =useState(iContent);
+  const [col,      setCol]      =useState(false);
+  const [modal,    setModal]    =useState(null);
+  const [form,     setForm]     =useState({});
 
-  const setPSt=(id,s)=>setProjects(ps=>ps.map(p=>p.id===id?{...p,status:s}:p));
-  const setPPr=(id,p)=>setProjects(ps=>ps.map(pr=>pr.id===id?{...pr,priority:p}:pr));
-  const setTSt=(id,s)=>setTasks(ts=>ts.map(t=>t.id===id?{...t,status:s}:t));
-  const setTPr=(id,p)=>setTasks(ts=>ts.map(t=>t.id===id?{...t,priority:p}:t));
-  const setCSt=(id,s)=>setContent(cs=>cs.map(c=>c.id===id?{...c,status:s}:c));
+  const setPSt =(id,s)=>setProjects(ps=>ps.map(p=>p.id===id?{...p,status:s}:p));
+  const setPPr =(id,p)=>setProjects(ps=>ps.map(pr=>pr.id===id?{...pr,priority:p}:pr));
+  const setCSt =(id,s)=>setContent(cs=>cs.map(c=>c.id===id?{...c,status:s}:c));
+
+  const toggleTask=id=>setTasks(ts=>ts.map(t=>t.id===id?{...t,status:t.status==="concluido"?"andamento":"concluido"}:t));
 
   const openModal=(type,defaultStatus)=>{
     setModal(type);
     if(type==="project") setForm({name:"",client:"",status:defaultStatus||"backlog",priority:"normal",deadline:"",desc:""});
-    else if(type==="task") setForm({title:"",projectId:projects[0]?.id||1,assignee:"",status:defaultStatus||"backlog",priority:"normal",deadline:""});
+    else if(type==="task") setForm({title:"",projectId:defaultStatus||projects[0]?.id||1,assignee:"",status:"backlog",priority:"normal",deadline:""});
     else setForm({title:"",platform:"instagram",type:"feed",status:defaultStatus||"ideia",date:"",caption:""});
   };
 
@@ -410,7 +486,7 @@ export default function App(){
     setModal(null);
   };
 
-  const stats = useMemo(()=>({
+  const stats=useMemo(()=>({
     active:    projects.filter(p=>["andamento","producao","revisao","aprovacao"].includes(p.status)).length,
     done:      projects.filter(p=>p.status==="concluido").length,
     urgent:    [...projects,...tasks].filter(x=>x.priority==="urgente").length,
@@ -424,194 +500,188 @@ export default function App(){
   const nav=[
     {id:"overview",  icon:"◈", label:"Visão Geral"},
     {id:"projects",  icon:"⬡", label:"Projetos"},
-    {id:"tasks",     icon:"◎", label:"Tarefas"},
     {id:"content",   icon:"✦", label:"Conteúdo"},
     {id:"calendar",  icon:"▦", label:"Calendário"},
     {id:"analytics", icon:"▲", label:"Analytics"},
   ];
 
-  const renderProjCard=(p,onSt,onPr)=>(
-    <div key={p.id}
-      style={{background:C.surface,border:`1px solid ${C.border}`,borderRadius:14,padding:14,transition:"box-shadow 0.2s,border-color 0.2s"}}
-      onMouseEnter={e=>{e.currentTarget.style.boxShadow=`0 0 0 1px ${C.borderHi},0 8px 24px rgba(0,0,0,0.5)`;e.currentTarget.style.borderColor=C.borderHi;}}
-      onMouseLeave={e=>{e.currentTarget.style.boxShadow="none";e.currentTarget.style.borderColor=C.border;}}>
-      <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:8,marginBottom:6}}>
-        <div style={{color:C.text1,fontFamily:"Space Grotesk,sans-serif",fontSize:13,fontWeight:700,lineHeight:1.3}}>{p.name}</div>
-        <Pip value={p.priority} onChange={v=>onPr(p.id,v)} options={PRIORITY}/>
-      </div>
-      <div style={{color:C.text3,fontSize:11,marginBottom:10}}>{p.client} · {p.deadline}</div>
-      <Pip value={p.status} onChange={v=>onSt(p.id,v)} options={STATUSES}/>
-    </div>
-  );
-
-  const renderTaskCard=(t,onSt,onPr)=>{
-    const proj=projects.find(p=>p.id===t.projectId);
-    return(
-      <div key={t.id}
-        style={{background:C.surface,border:`1px solid ${C.border}`,borderRadius:14,padding:14,transition:"box-shadow 0.2s,border-color 0.2s"}}
-        onMouseEnter={e=>{e.currentTarget.style.boxShadow=`0 0 0 1px ${C.borderHi},0 8px 24px rgba(0,0,0,0.5)`;e.currentTarget.style.borderColor=C.borderHi;}}
-        onMouseLeave={e=>{e.currentTarget.style.boxShadow="none";e.currentTarget.style.borderColor=C.border;}}>
-        <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:8,marginBottom:4}}>
-          <div style={{color:C.text1,fontFamily:"Space Grotesk,sans-serif",fontSize:13,fontWeight:600}}>{t.title}</div>
-          <Pip value={t.priority} onChange={v=>onPr(t.id,v)} options={PRIORITY}/>
-        </div>
-        <div style={{color:C.text3,fontSize:11,marginBottom:8}}>{proj?.name||"—"} · {t.assignee}</div>
-        <Pip value={t.status} onChange={v=>onSt(t.id,v)} options={STATUSES}/>
-      </div>
-    );
-  };
-
-  const headerTitle = nav.find(n=>n.id===view)?.label;
-
   return(
-    <div style={{background:C.bg,color:C.text1,fontFamily:"Inter,sans-serif",display:"flex",height:"100vh",overflow:"hidden"}}>
+    <div style={{background:C.bg,color:C.text1,fontFamily:C.fontBody,display:"flex",height:"100vh",overflow:"hidden"}}>
 
-      {/* SIDEBAR */}
-      <aside style={{background:C.surface,borderRight:`1px solid ${C.border}`,width:col?56:220,flexShrink:0,display:"flex",flexDirection:"column",transition:"width 0.25s cubic-bezier(.4,0,.2,1)"}}>
-        <div style={{borderBottom:`1px solid ${C.border}`,padding:"18px 14px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-          {!col&&<div>
-            <div style={{fontFamily:"Space Grotesk,sans-serif",color:C.accent,letterSpacing:"0.2em",fontSize:13,fontWeight:900}}>CONEX</div>
-            <div style={{color:C.text3,fontSize:10,marginTop:1}}>Studio</div>
-          </div>}
-          <button onClick={()=>setCol(s=>!s)} style={{color:C.text3,marginLeft:col?"auto":0,fontSize:11,background:"none",border:"none",cursor:"pointer"}}>{col?"▶":"◀"}</button>
+      {/* ── SIDEBAR ── */}
+      <aside style={{background:C.surface,borderRight:`1px solid ${C.border}`,width:col?60:224,flexShrink:0,display:"flex",flexDirection:"column",transition:"width 0.25s cubic-bezier(.4,0,.2,1)",overflow:"hidden"}}>
+        {/* Logo */}
+        <div style={{borderBottom:`1px solid ${C.border}`,padding:col?"14px 10px":"16px 18px",display:"flex",alignItems:"center",justifyContent:"space-between",minHeight:64}}>
+          {col
+            ? <div style={{fontFamily:C.font,color:C.accent,fontSize:15,fontWeight:900,letterSpacing:"0.08em",margin:"0 auto"}}>cnx</div>
+            : <img src="/logo-conex-branca.png" alt="Conex Studio" style={{height:22,objectFit:"contain",filter:"brightness(0) invert(1)"}}/>
+          }
+          {!col&&<button onClick={()=>setCol(s=>!s)} style={{color:C.text3,fontSize:10,background:C.card,border:`1px solid ${C.border}`,cursor:"pointer",borderRadius:6,width:22,height:22,display:"flex",alignItems:"center",justifyContent:"center"}}>◀</button>}
         </div>
-        <nav style={{flex:1,padding:"12px 8px",display:"flex",flexDirection:"column",gap:2}}>
-          {nav.map(item=>(
-            <button key={item.id} onClick={()=>setView(item.id)}
-              style={{background:view===item.id?`${C.accent}12`:"transparent",color:view===item.id?C.accent:C.text2,fontFamily:"Space Grotesk,sans-serif",width:"100%",display:"flex",alignItems:"center",gap:10,padding:"9px 12px",borderRadius:"0 10px 10px 0",fontSize:13,fontWeight:500,cursor:"pointer",border:"none",borderLeft:view===item.id?`2px solid ${C.accent}`:"2px solid transparent"}}>
-              <span style={{fontSize:13}}>{item.icon}</span>
-              {!col&&item.label}
-            </button>
-          ))}
+
+        {col&&<button onClick={()=>setCol(false)} style={{color:C.text3,fontSize:10,background:C.card,border:`1px solid ${C.border}`,cursor:"pointer",margin:"8px auto",borderRadius:6,width:32,height:22,display:"flex",alignItems:"center",justifyContent:"center"}}>▶</button>}
+
+        {/* Nav */}
+        <nav style={{flex:1,padding:"10px 8px",display:"flex",flexDirection:"column",gap:2}}>
+          {nav.map(item=>{
+            const active=view===item.id;
+            return(
+              <button key={item.id} onClick={()=>setView(item.id)}
+                style={{background:active?C.accentDim:"transparent",color:active?C.accent:C.text2,fontFamily:C.font,width:"100%",display:"flex",alignItems:"center",gap:10,padding:col?"10px 0":"9px 14px",justifyContent:col?"center":"flex-start",borderRadius:12,fontSize:13,fontWeight:active?800:600,cursor:"pointer",border:"none",borderLeft:active&&!col?`2px solid ${C.accent}`:"2px solid transparent",transition:"all 0.15s"}}>
+                <span style={{fontSize:14}}>{item.icon}</span>
+                {!col&&<span>{item.label}</span>}
+              </button>
+            );
+          })}
         </nav>
-        {!col&&<div style={{borderTop:`1px solid ${C.border}`,padding:"12px 16px"}}>
-          <div style={{color:C.text3,fontSize:10}}>conexstudio.com.br</div>
+
+        {/* Footer */}
+        {!col&&<div style={{borderTop:`1px solid ${C.border}`,padding:"12px 18px"}}>
+          <div style={{color:C.text3,fontSize:10,fontFamily:C.font,fontWeight:600}}>conexstudio.com.br</div>
         </div>}
       </aside>
 
-      {/* MAIN */}
+      {/* ── MAIN ── */}
       <main style={{flex:1,overflowY:"auto"}}>
-        <div style={{background:`${C.bg}F5`,borderBottom:`1px solid ${C.border}`,backdropFilter:"blur(16px)",position:"sticky",top:0,zIndex:10,padding:"14px 24px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+        {/* Topbar */}
+        <div style={{background:`${C.bg}EE`,borderBottom:`1px solid ${C.border}`,backdropFilter:"blur(20px)",position:"sticky",top:0,zIndex:10,padding:"14px 28px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
           <div>
-            <h1 style={{fontFamily:"Space Grotesk,sans-serif",color:C.text1,fontSize:17,fontWeight:800,margin:0}}>{headerTitle}</h1>
-            <p style={{color:C.text3,fontSize:11,margin:0,marginTop:2}}>Conex Studio · Gestão interna</p>
+            <h1 style={{fontFamily:C.font,color:C.text1,fontSize:18,fontWeight:900,margin:0,letterSpacing:"-0.02em"}}>
+              {nav.find(n=>n.id===view)?.label}
+            </h1>
+            <p style={{color:C.text3,fontSize:11,margin:0,marginTop:2,fontFamily:C.fontBody}}>Conex Studio · Gestão interna</p>
           </div>
-          {view==="projects"&&<button onClick={()=>openModal("project")} style={{background:C.accent,color:"#080808",fontFamily:"Space Grotesk,sans-serif",fontWeight:900,fontSize:12,padding:"8px 16px",borderRadius:10,border:"none",cursor:"pointer"}}>+ Novo Projeto</button>}
-          {view==="tasks"&&<button onClick={()=>openModal("task")} style={{background:C.accent,color:"#080808",fontFamily:"Space Grotesk,sans-serif",fontWeight:900,fontSize:12,padding:"8px 16px",borderRadius:10,border:"none",cursor:"pointer"}}>+ Nova Tarefa</button>}
+          {view==="projects"&&(
+            <button onClick={()=>openModal("project")}
+              style={{background:C.accent,color:"#060606",fontFamily:C.font,fontWeight:900,fontSize:12,padding:"9px 20px",borderRadius:12,border:"none",cursor:"pointer",letterSpacing:"0.02em"}}>
+              + Novo Projeto
+            </button>
+          )}
         </div>
 
-        <div style={{padding:24}}>
+        <div style={{padding:28}}>
 
-          {/* OVERVIEW */}
+          {/* ── OVERVIEW ── */}
           {view==="overview"&&<>
             <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:16,marginBottom:28}}>
-              <StatCard label="Em execução"    value={stats.active}    accent={C.accent} chart/>
-              <StatCard label="Concluídos"     value={stats.done}      accent="#4ADE80"  chart/>
-              <StatCard label="Urgentes"       value={stats.urgent}    accent="#FF4444"  chart/>
-              <StatCard label="Total Projetos" value={stats.total}     accent="#60A5FA"  chart/>
-              <StatCard label="Tasks abertas"  value={stats.topen}     accent="#C084FC"  chart/>
-              <StatCard label="Tasks feitas"   value={stats.tdone}     accent="#4ADE80"  chart/>
-              <StatCard label="Conteúdos"      value={stats.ctotal}    accent="#E1306C"  chart/>
-              <StatCard label="Agendados"      value={stats.scheduled} accent="#B8F500"  chart/>
+              <StatCard label="Em execução"    value={stats.active}    accent={C.accent}  chart/>
+              <StatCard label="Concluídos"     value={stats.done}      accent={C.success} chart/>
+              <StatCard label="Urgentes"       value={stats.urgent}    accent={C.danger}  chart/>
+              <StatCard label="Total Projetos" value={stats.total}     accent={C.info}    chart/>
+              <StatCard label="Tasks abertas"  value={stats.topen}     accent="#C084FC"   chart/>
+              <StatCard label="Tasks feitas"   value={stats.tdone}     accent={C.success} chart/>
+              <StatCard label="Conteúdos"      value={stats.ctotal}    accent="#E1306C"   chart/>
+              <StatCard label="Agendados"      value={stats.scheduled} accent={C.accent}  chart/>
             </div>
-            <div style={{display:"grid",gridTemplateColumns:"2fr 1fr",gap:16,marginBottom:20}}>
-              <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:16,padding:20}}>
-                <div style={{color:C.text2,fontSize:11,letterSpacing:"0.1em",fontFamily:"Space Grotesk,sans-serif",marginBottom:16,textTransform:"uppercase"}}>Projetos / mês</div>
+            <div style={{display:"grid",gridTemplateColumns:"2fr 1fr",gap:16,marginBottom:16}}>
+              <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:18,padding:22}}>
+                <div style={{color:C.text2,fontSize:10,letterSpacing:"0.12em",fontFamily:C.font,fontWeight:700,marginBottom:16,textTransform:"uppercase"}}>Projetos / mês</div>
                 <ResponsiveContainer width="100%" height={160}>
                   <AreaChart data={revenueData}>
                     <defs><linearGradient id="aG" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor={C.accent} stopOpacity={0.25}/>
+                      <stop offset="0%" stopColor={C.accent} stopOpacity={0.3}/>
                       <stop offset="100%" stopColor={C.accent} stopOpacity={0}/>
                     </linearGradient></defs>
-                    <XAxis dataKey="m" tick={{fill:C.text3,fontSize:11}} axisLine={false} tickLine={false}/>
-                    <YAxis tick={{fill:C.text3,fontSize:11}} axisLine={false} tickLine={false}/>
+                    <XAxis dataKey="m" tick={{fill:C.text3,fontSize:11,fontFamily:C.font}} axisLine={false} tickLine={false}/>
+                    <YAxis tick={{fill:C.text3,fontSize:11,fontFamily:C.font}} axisLine={false} tickLine={false}/>
                     <Tooltip content={<CustomTooltip/>}/>
                     <Area type="monotone" dataKey="v" name="Projetos" stroke={C.accent} strokeWidth={2} fill="url(#aG)" dot={false}/>
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
-              <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:16,padding:20}}>
-                <div style={{color:C.text2,fontSize:11,letterSpacing:"0.1em",fontFamily:"Space Grotesk,sans-serif",marginBottom:12,textTransform:"uppercase"}}>Por Categoria</div>
+              <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:18,padding:22}}>
+                <div style={{color:C.text2,fontSize:10,letterSpacing:"0.12em",fontFamily:C.font,fontWeight:700,marginBottom:14,textTransform:"uppercase"}}>Por Categoria</div>
                 <ResponsiveContainer width="100%" height={130}>
                   <PieChart>
-                    <Pie data={pieData} cx="50%" cy="50%" innerRadius={38} outerRadius={58} paddingAngle={3} dataKey="value">
+                    <Pie data={pieData} cx="50%" cy="50%" innerRadius={40} outerRadius={58} paddingAngle={4} dataKey="value">
                       {pieData.map((e,i)=><Cell key={i} fill={e.color} stroke="transparent"/>)}
                     </Pie>
                     <Tooltip content={<CustomTooltip/>}/>
                   </PieChart>
                 </ResponsiveContainer>
-                <div style={{display:"flex",flexDirection:"column",gap:4,marginTop:8}}>
+                <div style={{display:"flex",flexDirection:"column",gap:5,marginTop:10}}>
                   {pieData.map(d=>(
                     <div key={d.name} style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-                      <div style={{display:"flex",alignItems:"center",gap:6}}>
+                      <div style={{display:"flex",alignItems:"center",gap:7}}>
                         <div style={{width:6,height:6,borderRadius:"50%",background:d.color}}/>
-                        <span style={{color:C.text2,fontSize:11}}>{d.name}</span>
+                        <span style={{color:C.text2,fontSize:11,fontFamily:C.fontBody}}>{d.name}</span>
                       </div>
-                      <span style={{color:d.color,fontSize:11,fontFamily:"Space Grotesk,sans-serif",fontWeight:700}}>{d.value}%</span>
+                      <span style={{color:d.color,fontSize:11,fontFamily:C.font,fontWeight:800}}>{d.value}%</span>
                     </div>
                   ))}
                 </div>
               </div>
             </div>
-            <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:16,padding:20}}>
-              <div style={{color:C.text2,fontSize:11,letterSpacing:"0.1em",fontFamily:"Space Grotesk,sans-serif",marginBottom:16,textTransform:"uppercase"}}>Tarefas — Concluídas vs Abertas</div>
+            <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:18,padding:22}}>
+              <div style={{color:C.text2,fontSize:10,letterSpacing:"0.12em",fontFamily:C.font,fontWeight:700,marginBottom:16,textTransform:"uppercase"}}>Tarefas — Concluídas vs Abertas</div>
               <ResponsiveContainer width="100%" height={160}>
                 <BarChart data={taskData} barGap={4}>
-                  <XAxis dataKey="m" tick={{fill:C.text3,fontSize:11}} axisLine={false} tickLine={false}/>
-                  <YAxis tick={{fill:C.text3,fontSize:11}} axisLine={false} tickLine={false}/>
+                  <XAxis dataKey="m" tick={{fill:C.text3,fontSize:11,fontFamily:C.font}} axisLine={false} tickLine={false}/>
+                  <YAxis tick={{fill:C.text3,fontSize:11,fontFamily:C.font}} axisLine={false} tickLine={false}/>
                   <Tooltip content={<CustomTooltip/>}/>
-                  <Bar dataKey="concluidas" name="Concluídas" fill={C.accent} radius={[4,4,0,0]}/>
-                  <Bar dataKey="abertas"    name="Abertas"    fill="#333"     radius={[4,4,0,0]}/>
+                  <Bar dataKey="c" name="Concluídas" fill={C.accent} radius={[5,5,0,0]}/>
+                  <Bar dataKey="a" name="Abertas"    fill="#222"    radius={[5,5,0,0]}/>
                 </BarChart>
               </ResponsiveContainer>
             </div>
           </>}
 
-          {view==="projects"&&<KanbanBoard items={projects} onStatusChange={setPSt} onPriorityChange={setPPr} renderCard={renderProjCard} onAdd={s=>openModal("project",s)} addLabel="Projeto"/>}
-          {view==="tasks"&&<KanbanBoard items={tasks} onStatusChange={setTSt} onPriorityChange={setTPr} renderCard={renderTaskCard} onAdd={s=>openModal("task",s)} addLabel="Tarefa"/>}
+          {/* ── PROJECTS (com tarefas integradas) ── */}
+          {view==="projects"&&(
+            <ProjectKanban
+              projects={projects} tasks={tasks}
+              onProjStatus={setPSt} onProjPriority={setPPr}
+              onTaskToggle={toggleTask}
+              onAddTask={pid=>openModal("task",pid)}
+              onAddProject={s=>openModal("project",s)}/>
+          )}
+
+          {/* ── CONTENT ── */}
           {view==="content"&&<ContentManager content={content} onStatusChange={setCSt} onAdd={s=>openModal("content",s)}/>}
+
+          {/* ── CALENDAR ── */}
           {view==="calendar"&&<CalendarView content={content}/>}
 
-          {/* ANALYTICS */}
+          {/* ── ANALYTICS ── */}
           {view==="analytics"&&<>
             <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:16,marginBottom:24}}>
-              <StatCard label="Proj. este mês" value="6"   accent={C.accent} chart/>
-              <StatCard label="Taxa conclusão" value="84%" accent="#4ADE80"  chart/>
-              <StatCard label="Em atraso"      value="2"   accent="#FF4444"  chart/>
+              <StatCard label="Proj. este mês" value="6"   accent={C.accent}  chart/>
+              <StatCard label="Taxa conclusão" value="84%" accent={C.success} chart/>
+              <StatCard label="Em atraso"      value="2"   accent={C.danger}  chart/>
             </div>
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}}>
-              <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:16,padding:20}}>
-                <div style={{color:C.text2,fontSize:11,letterSpacing:"0.1em",fontFamily:"Space Grotesk,sans-serif",marginBottom:16,textTransform:"uppercase"}}>Crescimento Mensal</div>
+              <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:18,padding:22}}>
+                <div style={{color:C.text2,fontSize:10,letterSpacing:"0.12em",fontFamily:C.font,fontWeight:700,marginBottom:16,textTransform:"uppercase"}}>Crescimento Mensal</div>
                 <ResponsiveContainer width="100%" height={180}>
                   <LineChart data={revenueData}>
-                    <XAxis dataKey="m" tick={{fill:C.text3,fontSize:11}} axisLine={false} tickLine={false}/>
-                    <YAxis tick={{fill:C.text3,fontSize:11}} axisLine={false} tickLine={false}/>
+                    <XAxis dataKey="m" tick={{fill:C.text3,fontSize:11,fontFamily:C.font}} axisLine={false} tickLine={false}/>
+                    <YAxis tick={{fill:C.text3,fontSize:11,fontFamily:C.font}} axisLine={false} tickLine={false}/>
                     <Tooltip content={<CustomTooltip/>}/>
                     <Line type="monotone" dataKey="v" name="Projetos" stroke={C.accent} strokeWidth={2} dot={{fill:C.accent,r:3}} activeDot={{r:5}}/>
                   </LineChart>
                 </ResponsiveContainer>
               </div>
-              <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:16,padding:20}}>
-                <div style={{color:C.text2,fontSize:11,letterSpacing:"0.1em",fontFamily:"Space Grotesk,sans-serif",marginBottom:16,textTransform:"uppercase"}}>Distribuição de Tasks</div>
+              <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:18,padding:22}}>
+                <div style={{color:C.text2,fontSize:10,letterSpacing:"0.12em",fontFamily:C.font,fontWeight:700,marginBottom:16,textTransform:"uppercase"}}>Distribuição de Tasks</div>
                 <ResponsiveContainer width="100%" height={180}>
                   <BarChart data={taskData}>
-                    <XAxis dataKey="m" tick={{fill:C.text3,fontSize:11}} axisLine={false} tickLine={false}/>
-                    <YAxis tick={{fill:C.text3,fontSize:11}} axisLine={false} tickLine={false}/>
+                    <XAxis dataKey="m" tick={{fill:C.text3,fontSize:11,fontFamily:C.font}} axisLine={false} tickLine={false}/>
+                    <YAxis tick={{fill:C.text3,fontSize:11,fontFamily:C.font}} axisLine={false} tickLine={false}/>
                     <Tooltip content={<CustomTooltip/>}/>
-                    <Bar dataKey="concluidas" name="Concluídas" fill={C.accent}  radius={[4,4,0,0]}/>
-                    <Bar dataKey="abertas"    name="Abertas"    fill="#C084FC"   radius={[4,4,0,0]}/>
+                    <Bar dataKey="c" name="Concluídas" fill={C.accent}  radius={[5,5,0,0]}/>
+                    <Bar dataKey="a" name="Abertas"    fill="#C084FC"   radius={[5,5,0,0]}/>
                   </BarChart>
                 </ResponsiveContainer>
               </div>
-              <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:16,padding:20,gridColumn:"1/-1"}}>
-                <div style={{color:C.text2,fontSize:11,letterSpacing:"0.1em",fontFamily:"Space Grotesk,sans-serif",marginBottom:16,textTransform:"uppercase"}}>Projetos por Status</div>
-                <div style={{display:"flex",gap:12,flexWrap:"wrap"}}>
+              <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:18,padding:22,gridColumn:"1/-1"}}>
+                <div style={{color:C.text2,fontSize:10,letterSpacing:"0.12em",fontFamily:C.font,fontWeight:700,marginBottom:16,textTransform:"uppercase"}}>Projetos por Status</div>
+                <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
                   {STATUSES.map(s=>{
                     const count=projects.filter(p=>p.status===s.id).length;
                     return(
-                      <div key={s.id} style={{background:s.bg,border:`1px solid ${s.color}22`,borderRadius:10,padding:"10px 16px",minWidth:100}}>
-                        <div style={{color:s.color,fontFamily:"Space Grotesk,sans-serif",fontSize:22,fontWeight:900}}>{count}</div>
-                        <div style={{color:s.color,opacity:0.7,fontSize:10,marginTop:2}}>{s.label}</div>
+                      <div key={s.id} style={{background:s.bg,border:`1px solid ${s.color}20`,borderRadius:12,padding:"12px 18px",minWidth:100}}>
+                        <div style={{color:s.color,fontFamily:C.font,fontSize:24,fontWeight:900,letterSpacing:"-0.02em"}}>{count}</div>
+                        <div style={{color:s.color,opacity:0.65,fontSize:10,marginTop:3,fontFamily:C.font,fontWeight:700}}>{s.label}</div>
                       </div>
                     );
                   })}
@@ -623,84 +693,48 @@ export default function App(){
         </div>
       </main>
 
-      {/* MODAL */}
+      {/* ── MODAL ── */}
       {modal&&(
         <Modal title={modal==="project"?"Novo Projeto":modal==="task"?"Nova Tarefa":"Novo Conteúdo"} onClose={()=>setModal(null)}>
+
           {modal==="project"&&<>
-            <Field label="Nome do projeto"><input style={inputSt} value={form.name||""} onChange={e=>setForm(f=>({...f,name:e.target.value}))} placeholder="Ex: Campanha Verão 2026"/></Field>
-            <Field label="Cliente"><input style={inputSt} value={form.client||""} onChange={e=>setForm(f=>({...f,client:e.target.value}))} placeholder="Nome do cliente"/></Field>
-            <Field label="Descrição"><input style={inputSt} value={form.desc||""} onChange={e=>setForm(f=>({...f,desc:e.target.value}))} placeholder="Breve descrição"/></Field>
+            <Field label="Nome do projeto"><input style={inputSt} value={form.name||""} onChange={e=>setForm(f=>({...f,name:e.target.value}))} placeholder="Ex: Campanha Verão 2026" onFocus={e=>e.target.style.borderColor=C.borderHi} onBlur={e=>e.target.style.borderColor=C.border}/></Field>
+            <Field label="Cliente"><input style={inputSt} value={form.client||""} onChange={e=>setForm(f=>({...f,client:e.target.value}))} placeholder="Nome do cliente" onFocus={e=>e.target.style.borderColor=C.borderHi} onBlur={e=>e.target.style.borderColor=C.border}/></Field>
+            <Field label="Descrição"><input style={inputSt} value={form.desc||""} onChange={e=>setForm(f=>({...f,desc:e.target.value}))} placeholder="Breve descrição" onFocus={e=>e.target.style.borderColor=C.borderHi} onBlur={e=>e.target.style.borderColor=C.border}/></Field>
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
-              <Field label="Status">
-                <select style={{...inputSt,cursor:"pointer"}} value={form.status||"backlog"} onChange={e=>setForm(f=>({...f,status:e.target.value}))}>
-                  {STATUSES.map(s=><option key={s.id} value={s.id}>{s.label}</option>)}
-                </select>
-              </Field>
-              <Field label="Prioridade">
-                <select style={{...inputSt,cursor:"pointer"}} value={form.priority||"normal"} onChange={e=>setForm(f=>({...f,priority:e.target.value}))}>
-                  {PRIORITY.map(p=><option key={p.id} value={p.id}>{p.label}</option>)}
-                </select>
-              </Field>
+              <Field label="Status"><select style={{...inputSt,cursor:"pointer"}} value={form.status||"backlog"} onChange={e=>setForm(f=>({...f,status:e.target.value}))}>{STATUSES.map(s=><option key={s.id} value={s.id}>{s.label}</option>)}</select></Field>
+              <Field label="Prioridade"><select style={{...inputSt,cursor:"pointer"}} value={form.priority||"normal"} onChange={e=>setForm(f=>({...f,priority:e.target.value}))}>{PRIORITY.map(p=><option key={p.id} value={p.id}>{p.label}</option>)}</select></Field>
             </div>
             <Field label="Prazo"><input style={inputSt} type="date" value={form.deadline||""} onChange={e=>setForm(f=>({...f,deadline:e.target.value}))}/></Field>
           </>}
 
           {modal==="task"&&<>
-            <Field label="Título da tarefa"><input style={inputSt} value={form.title||""} onChange={e=>setForm(f=>({...f,title:e.target.value}))} placeholder="Ex: Criar artes para stories"/></Field>
-            <Field label="Projeto">
-              <select style={{...inputSt,cursor:"pointer"}} value={form.projectId||""} onChange={e=>setForm(f=>({...f,projectId:e.target.value}))}>
-                {projects.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}
-              </select>
-            </Field>
-            <Field label="Responsável"><input style={inputSt} value={form.assignee||""} onChange={e=>setForm(f=>({...f,assignee:e.target.value}))} placeholder="Nome do responsável"/></Field>
+            <Field label="Título da tarefa"><input style={inputSt} value={form.title||""} onChange={e=>setForm(f=>({...f,title:e.target.value}))} placeholder="Ex: Criar artes para stories" onFocus={e=>e.target.style.borderColor=C.borderHi} onBlur={e=>e.target.style.borderColor=C.border}/></Field>
+            <Field label="Projeto"><select style={{...inputSt,cursor:"pointer"}} value={form.projectId||""} onChange={e=>setForm(f=>({...f,projectId:e.target.value}))}>{projects.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select></Field>
+            <Field label="Responsável"><input style={inputSt} value={form.assignee||""} onChange={e=>setForm(f=>({...f,assignee:e.target.value}))} placeholder="Nome do responsável" onFocus={e=>e.target.style.borderColor=C.borderHi} onBlur={e=>e.target.style.borderColor=C.border}/></Field>
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
-              <Field label="Status">
-                <select style={{...inputSt,cursor:"pointer"}} value={form.status||"backlog"} onChange={e=>setForm(f=>({...f,status:e.target.value}))}>
-                  {STATUSES.map(s=><option key={s.id} value={s.id}>{s.label}</option>)}
-                </select>
-              </Field>
-              <Field label="Prioridade">
-                <select style={{...inputSt,cursor:"pointer"}} value={form.priority||"normal"} onChange={e=>setForm(f=>({...f,priority:e.target.value}))}>
-                  {PRIORITY.map(p=><option key={p.id} value={p.id}>{p.label}</option>)}
-                </select>
-              </Field>
+              <Field label="Prioridade"><select style={{...inputSt,cursor:"pointer"}} value={form.priority||"normal"} onChange={e=>setForm(f=>({...f,priority:e.target.value}))}>{PRIORITY.map(p=><option key={p.id} value={p.id}>{p.label}</option>)}</select></Field>
+              <Field label="Prazo"><input style={inputSt} type="date" value={form.deadline||""} onChange={e=>setForm(f=>({...f,deadline:e.target.value}))}/></Field>
             </div>
-            <Field label="Prazo"><input style={inputSt} type="date" value={form.deadline||""} onChange={e=>setForm(f=>({...f,deadline:e.target.value}))}/></Field>
           </>}
 
           {modal==="content"&&<>
-            <Field label="Título"><input style={inputSt} value={form.title||""} onChange={e=>setForm(f=>({...f,title:e.target.value}))} placeholder="Ex: Post lançamento produto"/></Field>
+            <Field label="Título"><input style={inputSt} value={form.title||""} onChange={e=>setForm(f=>({...f,title:e.target.value}))} placeholder="Ex: Post lançamento produto" onFocus={e=>e.target.style.borderColor=C.borderHi} onBlur={e=>e.target.style.borderColor=C.border}/></Field>
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
-              <Field label="Plataforma">
-                <select style={{...inputSt,cursor:"pointer"}} value={form.platform||"instagram"} onChange={e=>setForm(f=>({...f,platform:e.target.value}))}>
-                  {PLATFORMS.map(p=><option key={p.id} value={p.id}>{p.label}</option>)}
-                </select>
-              </Field>
-              <Field label="Tipo">
-                <select style={{...inputSt,cursor:"pointer"}} value={form.type||"feed"} onChange={e=>setForm(f=>({...f,type:e.target.value}))}>
-                  <option value="feed">Feed</option>
-                  <option value="stories">Stories</option>
-                  <option value="reels">Reels</option>
-                  <option value="video">Vídeo</option>
-                  <option value="post">Post</option>
-                  <option value="shorts">Shorts</option>
-                </select>
-              </Field>
+              <Field label="Plataforma"><select style={{...inputSt,cursor:"pointer"}} value={form.platform||"instagram"} onChange={e=>setForm(f=>({...f,platform:e.target.value}))}>{PLATFORMS.map(p=><option key={p.id} value={p.id}>{p.label}</option>)}</select></Field>
+              <Field label="Tipo"><select style={{...inputSt,cursor:"pointer"}} value={form.type||"feed"} onChange={e=>setForm(f=>({...f,type:e.target.value}))}>
+                <option value="feed">Feed</option><option value="stories">Stories</option><option value="reels">Reels</option>
+                <option value="video">Vídeo</option><option value="post">Post</option><option value="shorts">Shorts</option>
+              </select></Field>
             </div>
-            <Field label="Status">
-              <select style={{...inputSt,cursor:"pointer"}} value={form.status||"ideia"} onChange={e=>setForm(f=>({...f,status:e.target.value}))}>
-                {CONTENT_STATUS.map(s=><option key={s.id} value={s.id}>{s.label}</option>)}
-              </select>
-            </Field>
+            <Field label="Status"><select style={{...inputSt,cursor:"pointer"}} value={form.status||"ideia"} onChange={e=>setForm(f=>({...f,status:e.target.value}))}>{CONTENT_STATUS.map(s=><option key={s.id} value={s.id}>{s.label}</option>)}</select></Field>
             <Field label="Data de publicação"><input style={inputSt} type="date" value={form.date||""} onChange={e=>setForm(f=>({...f,date:e.target.value}))}/></Field>
-            <Field label="Legenda">
-              <textarea style={{...inputSt,resize:"vertical",minHeight:80}} value={form.caption||""} onChange={e=>setForm(f=>({...f,caption:e.target.value}))} placeholder="Escreva a legenda aqui..."/>
-            </Field>
+            <Field label="Legenda"><textarea style={{...inputSt,resize:"vertical",minHeight:80}} value={form.caption||""} onChange={e=>setForm(f=>({...f,caption:e.target.value}))} placeholder="Escreva a legenda aqui..." onFocus={e=>e.target.style.borderColor=C.borderHi} onBlur={e=>e.target.style.borderColor=C.border}/></Field>
           </>}
 
-          <div style={{display:"flex",gap:8,justifyContent:"flex-end",marginTop:8}}>
-            <button onClick={()=>setModal(null)} style={{padding:"9px 18px",borderRadius:10,border:`1px solid ${C.border}`,background:"transparent",color:C.text2,fontSize:13,cursor:"pointer",fontFamily:"Space Grotesk,sans-serif"}}>Cancelar</button>
-            <button onClick={submitModal} style={{padding:"9px 18px",borderRadius:10,border:"none",background:C.accent,color:"#080808",fontSize:13,fontWeight:800,cursor:"pointer",fontFamily:"Space Grotesk,sans-serif"}}>Criar</button>
+          <div style={{display:"flex",gap:10,justifyContent:"flex-end",marginTop:6}}>
+            <button onClick={()=>setModal(null)} style={{padding:"10px 20px",borderRadius:12,border:`1px solid ${C.border}`,background:"transparent",color:C.text2,fontSize:13,fontFamily:C.font,fontWeight:700,cursor:"pointer",transition:"border-color 0.15s"}} onMouseEnter={e=>e.currentTarget.style.borderColor=C.borderHi} onMouseLeave={e=>e.currentTarget.style.borderColor=C.border}>Cancelar</button>
+            <button onClick={submitModal} style={{padding:"10px 22px",borderRadius:12,border:"none",background:C.accent,color:"#060606",fontSize:13,fontFamily:C.font,fontWeight:900,cursor:"pointer",letterSpacing:"0.01em"}}>Criar</button>
           </div>
         </Modal>
       )}
