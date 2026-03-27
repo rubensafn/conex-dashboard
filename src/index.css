@@ -5,13 +5,128 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  background: #080808;
-  color: #F0F0F0;
-  font-family: 'Inter', sans-serif;
+  background: #060606;
+  color: #F2F2F2;
+  font-family: 'Nunito Sans', sans-serif;
   -webkit-font-smoothing: antialiased;
+  overflow: hidden;
 }
 
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #222; border-radius: 99px; }
-::-webkit-scrollbar-thumb:hover { background: #333; }
+::-webkit-scrollbar-thumb { background: #1E1E1E; border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: #2E2E2E; }
+
+/* ── BLOB MORPH ── */
+@keyframes blob1 {
+  0%,100% { border-radius: 60% 40% 70% 30% / 50% 60% 40% 70%; transform: translate(0,0) scale(1); }
+  33%      { border-radius: 40% 60% 30% 70% / 60% 40% 70% 50%; transform: translate(30px,-20px) scale(1.05); }
+  66%      { border-radius: 70% 30% 50% 50% / 30% 70% 60% 40%; transform: translate(-20px,30px) scale(0.97); }
+}
+@keyframes blob2 {
+  0%,100% { border-radius: 50% 50% 40% 60% / 40% 60% 50% 50%; transform: translate(0,0) scale(1); }
+  33%      { border-radius: 30% 70% 60% 40% / 70% 30% 50% 60%; transform: translate(-25px,15px) scale(1.08); }
+  66%      { border-radius: 60% 40% 70% 30% / 50% 40% 70% 60%; transform: translate(20px,-25px) scale(0.95); }
+}
+@keyframes blob3 {
+  0%,100% { border-radius: 70% 30% 50% 50% / 60% 50% 40% 70%; transform: translate(0,0) scale(1); }
+  50%      { border-radius: 30% 70% 70% 30% / 40% 60% 50% 50%; transform: translate(15px,20px) scale(1.06); }
+}
+
+/* ── LIQUID METAL SHINE ── */
+@keyframes metal-shine {
+  0%   { background-position: -300% center; }
+  100% { background-position: 300% center; }
+}
+
+/* ── FLOAT ── */
+@keyframes float {
+  0%,100% { transform: translateY(0px); }
+  50%      { transform: translateY(-8px); }
+}
+
+/* ── PULSE GLOW ── */
+@keyframes pulse-glow {
+  0%,100% { opacity: 0.4; transform: scale(1); }
+  50%      { opacity: 0.7; transform: scale(1.08); }
+}
+
+/* ── SHIMMER BORDER ── */
+@keyframes border-spin {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ── FADE IN UP ── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── GLASS CARD ── */
+.glass {
+  background: rgba(255,255,255,0.025);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.07),
+    inset 0 -1px 0 rgba(0,0,0,0.3),
+    0 24px 48px rgba(0,0,0,0.5);
+}
+
+.glass:hover {
+  background: rgba(255,255,255,0.04);
+  border-color: rgba(255,255,255,0.1);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.12),
+    inset 0 -1px 0 rgba(0,0,0,0.3),
+    0 32px 64px rgba(0,0,0,0.6);
+}
+
+/* ── METAL ACCENT ── */
+.metal-text {
+  background: linear-gradient(
+    90deg,
+    #B8F500 0%,
+    #ECFF80 30%,
+    #FFFFFF 45%,
+    #ECFF80 55%,
+    #B8F500 70%,
+    #8BC400 85%,
+    #B8F500 100%
+  );
+  background-size: 300% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: metal-shine 4s linear infinite;
+}
+
+/* ── CARD ANIMATE ── */
+.card-animate {
+  animation: fadeInUp 0.4s ease both;
+}
+
+/* ── GLOW BUTTON ── */
+.glow-btn {
+  position: relative;
+  background: #B8F500;
+  color: #060606;
+  overflow: hidden;
+  transition: box-shadow 0.3s, transform 0.15s;
+}
+.glow-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.35) 50%, transparent 100%);
+  background-size: 200% auto;
+  animation: metal-shine 2.5s linear infinite;
+  pointer-events: none;
+}
+.glow-btn:hover {
+  box-shadow: 0 0 24px rgba(184,245,0,0.5), 0 0 60px rgba(184,245,0,0.2);
+  transform: translateY(-1px);
+}
+.glow-btn:active { transform: translateY(0); }

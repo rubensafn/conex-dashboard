@@ -94,6 +94,31 @@ const iContent = [
 const getSt = id => STATUSES.find(s=>s.id===id)||STATUSES[0];
 const getPl = id => PLATFORMS.find(p=>p.id===id)||PLATFORMS[0];
 
+/* ─── BACKGROUND BLOBS ─── */
+function BackgroundBlobs(){
+  return(
+    <div style={{position:"fixed",inset:0,zIndex:0,overflow:"hidden",pointerEvents:"none"}}>
+      <div style={{position:"absolute",width:700,height:700,top:"-15%",left:"-8%",background:"radial-gradient(circle,rgba(184,245,0,0.07) 0%,transparent 65%)",animation:"blob1 20s ease-in-out infinite",filter:"blur(50px)"}}/>
+      <div style={{position:"absolute",width:550,height:550,bottom:"5%",right:"0%",background:"radial-gradient(circle,rgba(96,165,250,0.06) 0%,transparent 65%)",animation:"blob2 26s ease-in-out infinite",filter:"blur(60px)"}}/>
+      <div style={{position:"absolute",width:480,height:480,top:"45%",left:"38%",background:"radial-gradient(circle,rgba(192,132,252,0.05) 0%,transparent 65%)",animation:"blob3 30s ease-in-out infinite",filter:"blur(70px)"}}/>
+      <div style={{position:"absolute",width:300,height:300,top:"20%",right:"25%",background:"radial-gradient(circle,rgba(184,245,0,0.04) 0%,transparent 70%)",animation:"blob1 38s ease-in-out infinite reverse",filter:"blur(40px)"}}/>
+    </div>
+  );
+}
+
+/* ─── MOUSE GLOW ─── */
+function MouseGlow(){
+  const [pos,setPos]=useState({x:-300,y:-300});
+  useEffect(()=>{
+    const fn=e=>setPos({x:e.clientX,y:e.clientY});
+    window.addEventListener("mousemove",fn);
+    return()=>window.removeEventListener("mousemove",fn);
+  },[]);
+  return(
+    <div style={{position:"fixed",pointerEvents:"none",zIndex:1,left:pos.x-250,top:pos.y-250,width:500,height:500,background:"radial-gradient(circle,rgba(184,245,0,0.035) 0%,transparent 70%)",borderRadius:"50%",transition:"left 0.12s ease-out,top 0.12s ease-out",filter:"blur(8px)"}}/>
+  );
+}
+
 /* ─── PIP DROPDOWN ─── */
 function Pip({value,onChange,options}){
   const [open,setOpen]=useState(false);
@@ -135,9 +160,9 @@ function Pip({value,onChange,options}){
 /* ─── STAT CARD ─── */
 function StatCard({label,value,accent,chart}){
   return(
-    <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:18,padding:22,position:"relative",overflow:"hidden",minHeight:115,transition:"border-color 0.2s"}}
-      onMouseEnter={e=>e.currentTarget.style.borderColor=C.borderHi}
-      onMouseLeave={e=>e.currentTarget.style.borderColor=C.border}>
+    <div className="glass card-animate" style={{borderRadius:18,padding:22,position:"relative",overflow:"hidden",minHeight:115,transition:"all 0.25s"}}
+      onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-3px)";e.currentTarget.style.boxShadow=`0 0 30px ${accent||C.accent}18,0 20px 50px rgba(0,0,0,0.5)`;}}
+      onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="";}}>
       <div style={{color:C.text2,fontSize:10,letterSpacing:"0.12em",fontFamily:C.font,marginBottom:8,textTransform:"uppercase",fontWeight:700}}>{label}</div>
       <div style={{color:accent||C.text1,fontFamily:C.font,fontSize:32,fontWeight:900,lineHeight:1,letterSpacing:"-0.02em"}}>{value}</div>
       {chart&&(
@@ -209,9 +234,9 @@ function ProjectCard({project,tasks,onProjStatus,onProjPriority,onTaskToggle,onA
   const st=getSt(project.status);
 
   return(
-    <div style={{background:C.surface,border:`1px solid ${C.border}`,borderRadius:18,padding:16,transition:"box-shadow 0.2s,border-color 0.2s",cursor:"default"}}
-      onMouseEnter={e=>{e.currentTarget.style.boxShadow=`0 0 0 1px ${C.borderHi},0 12px 32px rgba(0,0,0,0.6)`;e.currentTarget.style.borderColor=C.borderHi;}}
-      onMouseLeave={e=>{e.currentTarget.style.boxShadow="none";e.currentTarget.style.borderColor=C.border;}}>
+    <div className="glass card-animate" style={{borderRadius:18,padding:16,transition:"all 0.25s",cursor:"default"}}
+      onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow=`0 0 24px rgba(184,245,0,0.06),0 16px 40px rgba(0,0,0,0.6)`;}}
+      onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="";}}>
 
       {/* Header */}
       <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:8,marginBottom:4}}>
@@ -368,9 +393,10 @@ function ContentManager({content,onStatusChange,onAdd}){
                       draggable
                       onDragStart={()=>setDragId(item.id)}
                       onDragEnd={()=>{setDragId(null);setOverCol(null);}}
-                      style={{opacity:dragId===item.id?0.4:1,cursor:"grab",background:C.surface,border:`1px solid ${C.border}`,borderRadius:16,padding:14,transition:"opacity 0.15s,box-shadow 0.2s,border-color 0.2s"}}
-                      onMouseEnter={e=>{e.currentTarget.style.boxShadow=`0 0 0 1px ${C.borderHi},0 10px 28px rgba(0,0,0,0.5)`;e.currentTarget.style.borderColor=C.borderHi;}}
-                      onMouseLeave={e=>{e.currentTarget.style.boxShadow="none";e.currentTarget.style.borderColor=C.border;}}>
+                      className="glass card-animate"
+                      style={{opacity:dragId===item.id?0.4:1,cursor:"grab",borderRadius:16,padding:14,transition:"all 0.25s"}}
+                      onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow=`0 0 20px rgba(184,245,0,0.05),0 12px 32px rgba(0,0,0,0.5)`;}}
+                      onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="";}}>
                       <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:8}}>
                         <span style={{background:`${pl.color}20`,color:pl.color,fontSize:10,fontWeight:800,padding:"3px 9px",borderRadius:7,fontFamily:C.font}}>{pl.label}</span>
                         <span style={{color:C.text3,fontSize:10,fontFamily:C.fontBody}}>{item.type}</span>
@@ -506,14 +532,16 @@ export default function App(){
   ];
 
   return(
-    <div style={{background:C.bg,color:C.text1,fontFamily:C.fontBody,display:"flex",height:"100vh",overflow:"hidden"}}>
+    <div style={{background:C.bg,color:C.text1,fontFamily:C.fontBody,display:"flex",height:"100vh",overflow:"hidden",position:"relative"}}>
+      <BackgroundBlobs/>
+      <MouseGlow/>
 
       {/* ── SIDEBAR ── */}
-      <aside style={{background:C.surface,borderRight:`1px solid ${C.border}`,width:col?60:224,flexShrink:0,display:"flex",flexDirection:"column",transition:"width 0.25s cubic-bezier(.4,0,.2,1)",overflow:"hidden"}}>
+      <aside className="glass" style={{borderRight:`1px solid rgba(255,255,255,0.05)`,width:col?60:224,flexShrink:0,display:"flex",flexDirection:"column",transition:"width 0.25s cubic-bezier(.4,0,.2,1)",overflow:"hidden",position:"relative",zIndex:10}}>
         {/* Logo */}
         <div style={{borderBottom:`1px solid ${C.border}`,padding:col?"14px 10px":"16px 18px",display:"flex",alignItems:"center",justifyContent:"space-between",minHeight:64}}>
           {col
-            ? <div style={{fontFamily:C.font,color:C.accent,fontSize:15,fontWeight:900,letterSpacing:"0.08em",margin:"0 auto"}}>cnx</div>
+            ? <div className="metal-text" style={{fontFamily:C.font,fontSize:15,fontWeight:900,letterSpacing:"0.08em",margin:"0 auto"}}>cnx</div>
             : <img src="/logo-conex-branca.png" alt="Conex Studio" style={{height:22,objectFit:"contain",filter:"brightness(0) invert(1)"}}/>
           }
           {!col&&<button onClick={()=>setCol(s=>!s)} style={{color:C.text3,fontSize:10,background:C.card,border:`1px solid ${C.border}`,cursor:"pointer",borderRadius:6,width:22,height:22,display:"flex",alignItems:"center",justifyContent:"center"}}>◀</button>}
@@ -542,9 +570,9 @@ export default function App(){
       </aside>
 
       {/* ── MAIN ── */}
-      <main style={{flex:1,overflowY:"auto"}}>
+      <main style={{flex:1,overflowY:"auto",position:"relative",zIndex:5}}>
         {/* Topbar */}
-        <div style={{background:`${C.bg}EE`,borderBottom:`1px solid ${C.border}`,backdropFilter:"blur(20px)",position:"sticky",top:0,zIndex:10,padding:"14px 28px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+        <div className="glass" style={{borderBottom:`1px solid rgba(255,255,255,0.05)`,position:"sticky",top:0,zIndex:10,padding:"14px 28px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
           <div>
             <h1 style={{fontFamily:C.font,color:C.text1,fontSize:18,fontWeight:900,margin:0,letterSpacing:"-0.02em"}}>
               {nav.find(n=>n.id===view)?.label}
@@ -552,8 +580,8 @@ export default function App(){
             <p style={{color:C.text3,fontSize:11,margin:0,marginTop:2,fontFamily:C.fontBody}}>Conex Studio · Gestão interna</p>
           </div>
           {view==="projects"&&(
-            <button onClick={()=>openModal("project")}
-              style={{background:C.accent,color:"#060606",fontFamily:C.font,fontWeight:900,fontSize:12,padding:"9px 20px",borderRadius:12,border:"none",cursor:"pointer",letterSpacing:"0.02em"}}>
+            <button className="glow-btn" onClick={()=>openModal("project")}
+              style={{fontFamily:C.font,fontWeight:900,fontSize:12,padding:"9px 20px",borderRadius:12,border:"none",cursor:"pointer",letterSpacing:"0.02em"}}>
               + Novo Projeto
             </button>
           )}
@@ -574,7 +602,7 @@ export default function App(){
               <StatCard label="Agendados"      value={stats.scheduled} accent={C.accent}  chart/>
             </div>
             <div style={{display:"grid",gridTemplateColumns:"2fr 1fr",gap:16,marginBottom:16}}>
-              <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:18,padding:22}}>
+              <div className="glass" style={{borderRadius:18,padding:22}}>
                 <div style={{color:C.text2,fontSize:10,letterSpacing:"0.12em",fontFamily:C.font,fontWeight:700,marginBottom:16,textTransform:"uppercase"}}>Projetos / mês</div>
                 <ResponsiveContainer width="100%" height={160}>
                   <AreaChart data={revenueData}>
@@ -589,7 +617,7 @@ export default function App(){
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
-              <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:18,padding:22}}>
+              <div className="glass" style={{borderRadius:18,padding:22}}>
                 <div style={{color:C.text2,fontSize:10,letterSpacing:"0.12em",fontFamily:C.font,fontWeight:700,marginBottom:14,textTransform:"uppercase"}}>Por Categoria</div>
                 <ResponsiveContainer width="100%" height={130}>
                   <PieChart>
@@ -650,7 +678,7 @@ export default function App(){
               <StatCard label="Em atraso"      value="2"   accent={C.danger}  chart/>
             </div>
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}}>
-              <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:18,padding:22}}>
+              <div className="glass" style={{borderRadius:18,padding:22}}>
                 <div style={{color:C.text2,fontSize:10,letterSpacing:"0.12em",fontFamily:C.font,fontWeight:700,marginBottom:16,textTransform:"uppercase"}}>Crescimento Mensal</div>
                 <ResponsiveContainer width="100%" height={180}>
                   <LineChart data={revenueData}>
@@ -661,7 +689,7 @@ export default function App(){
                   </LineChart>
                 </ResponsiveContainer>
               </div>
-              <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:18,padding:22}}>
+              <div className="glass" style={{borderRadius:18,padding:22}}>
                 <div style={{color:C.text2,fontSize:10,letterSpacing:"0.12em",fontFamily:C.font,fontWeight:700,marginBottom:16,textTransform:"uppercase"}}>Distribuição de Tasks</div>
                 <ResponsiveContainer width="100%" height={180}>
                   <BarChart data={taskData}>
@@ -734,7 +762,7 @@ export default function App(){
 
           <div style={{display:"flex",gap:10,justifyContent:"flex-end",marginTop:6}}>
             <button onClick={()=>setModal(null)} style={{padding:"10px 20px",borderRadius:12,border:`1px solid ${C.border}`,background:"transparent",color:C.text2,fontSize:13,fontFamily:C.font,fontWeight:700,cursor:"pointer",transition:"border-color 0.15s"}} onMouseEnter={e=>e.currentTarget.style.borderColor=C.borderHi} onMouseLeave={e=>e.currentTarget.style.borderColor=C.border}>Cancelar</button>
-            <button onClick={submitModal} style={{padding:"10px 22px",borderRadius:12,border:"none",background:C.accent,color:"#060606",fontSize:13,fontFamily:C.font,fontWeight:900,cursor:"pointer",letterSpacing:"0.01em"}}>Criar</button>
+            <button className="glow-btn" onClick={submitModal} style={{padding:"10px 22px",borderRadius:12,border:"none",fontSize:13,fontFamily:C.font,fontWeight:900,cursor:"pointer",letterSpacing:"0.01em"}}>Criar</button>
           </div>
         </Modal>
       )}
