@@ -47,6 +47,31 @@ const PLATFORMS = [
   {id:"linkedin",  label:"LinkedIn",  color:"#0A66C2"},
 ];
 
+/* ─── ANALYTICS DATA ─── */
+const followerGrowth = [
+  {m:"Out",v:41200},{m:"Nov",v:43100},{m:"Dez",v:44800},
+  {m:"Jan",v:46200},{m:"Fev",v:48100},{m:"Mar",v:49800},
+];
+const engagementRate = [
+  {m:"Out",v:5.2},{m:"Nov",v:5.8},{m:"Dez",v:6.1},
+  {m:"Jan",v:5.9},{m:"Fev",v:6.4},{m:"Mar",v:6.73},
+];
+const impressionsDaily = [
+  {d:"21/3",v:68400,ig:38000,yt:18400,li:12000},
+  {d:"22/3",v:72100,ig:42000,yt:17100,li:13000},
+  {d:"23/3",v:58900,ig:31000,yt:16900,li:11000},
+  {d:"24/3",v:81200,ig:48000,yt:19200,li:14000},
+  {d:"25/3",v:94500,ig:55000,yt:24500,li:15000},
+  {d:"26/3",v:87300,ig:51000,yt:22300,li:14000},
+  {d:"27/3",v:112400,ig:68000,yt:27400,li:17000},
+];
+const topPosts = [
+  {id:1,title:"Reel verão ☀️",platform:"instagram",type:"reels",impressions:"48.2K",engagement:"8.4%",color:"#E1306C"},
+  {id:2,title:"Case de sucesso",platform:"linkedin",type:"post",impressions:"32.1K",engagement:"6.2%",color:"#0A66C2"},
+  {id:3,title:"Making of projeto",platform:"instagram",type:"carousel",impressions:"28.9K",engagement:"7.1%",color:"#E1306C"},
+  {id:4,title:"Dica de branding",platform:"instagram",type:"feed",impressions:"22.4K",engagement:"5.8%",color:"#E1306C"},
+];
+
 /* ─── CHART DATA ─── */
 const revenueData = [
   {m:"Out",v:18},{m:"Nov",v:24},{m:"Dez",v:19},{m:"Jan",v:31},{m:"Fev",v:28},{m:"Mar",v:38},
@@ -62,8 +87,35 @@ const pieData = [
   {name:"Web",     value:20,color:"#F59E0B"},
 ];
 
+/* ─── NEWS DATA ─── */
+const NEWS_CATS = [
+  {id:"all",      label:"Todos",       color:"#B8F500"},
+  {id:"marketing",label:"Marketing",   color:"#F59E0B"},
+  {id:"social",   label:"Social Media",color:"#E1306C"},
+  {id:"design",   label:"Design",      color:"#C084FC"},
+  {id:"tech",     label:"Tecnologia",  color:"#60A5FA"},
+];
+const iNews = [
+  {id:1,title:"Marketing digital bate recorde de investimento no Brasil em 2026",source:"Meio & Mensagem",date:"27 mar",category:"marketing",read:false},
+  {id:2,title:"Instagram lança novas ferramentas para criadores de conteúdo",source:"TechCrunch",date:"27 mar",category:"social",read:false},
+  {id:3,title:"Tendências de branding para o segundo semestre de 2026",source:"Behance Blog",date:"26 mar",category:"design",read:false},
+  {id:4,title:"TikTok supera YouTube em tempo de visualização no Brasil",source:"Folha de S.Paulo",date:"26 mar",category:"social",read:true},
+  {id:5,title:"IA no design gráfico: ameaça ou ferramenta?",source:"Aberta Magazine",date:"25 mar",category:"design",read:true},
+  {id:6,title:"LinkedIn atinge 80 milhões de usuários no Brasil",source:"Bloomberg",date:"25 mar",category:"social",read:true},
+  {id:7,title:"Novos algoritmos do Google impactam estratégias de SEO local",source:"Search Engine Journal",date:"24 mar",category:"tech",read:true},
+  {id:8,title:"Marcas investem mais em vídeo curto para engajar geração Z",source:"Exame",date:"24 mar",category:"marketing",read:true},
+];
+
+/* ─── COMPETITORS DATA ─── */
+const iCompetitors = [
+  {id:1,name:"@agencia.x",       platform:"instagram",followers:"45.2K",engagement:"3.8%",postsPerWeek:5, growth:"+2.1%",growthPositive:true},
+  {id:2,name:"@studio.criativo", platform:"instagram",followers:"28.9K",engagement:"5.2%",postsPerWeek:7, growth:"+0.8%",growthPositive:true},
+  {id:3,name:"AgenciaY",         platform:"youtube",  followers:"12.4K",engagement:"4.1%",postsPerWeek:2, growth:"-0.3%",growthPositive:false},
+  {id:4,name:"Design House BR",  platform:"linkedin", followers:"8.7K", engagement:"3.2%",postsPerWeek:3, growth:"+1.5%",growthPositive:true},
+];
+
 /* ─── INITIAL DATA ─── */
-let nPid=6, nTid=8, nCid=6;
+let nPid=6, nTid=8, nCid=6, nCompId=5;
 
 const iProjects = [
   {id:1,name:"Campanha Verão 2026",  client:"Cliente A",status:"andamento", priority:"urgente",deadline:"2026-04-15",desc:"Campanha redes sociais"},
@@ -183,6 +235,24 @@ function StatCard({label,value,accent,chart}){
   );
 }
 
+/* ─── METRIC CARD (Analytics) ─── */
+function MetricCard({label,value,delta,positive,color}){
+  return(
+    <div className="glass card-animate" style={{borderRadius:18,padding:24,position:"relative",overflow:"hidden",transition:"all 0.25s"}}
+      onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-3px)";e.currentTarget.style.boxShadow=`0 0 30px ${color||C.accent}18,0 20px 50px rgba(0,0,0,0.5)`;}}
+      onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="";}}>
+      <div style={{color:C.text2,fontSize:10,letterSpacing:"0.12em",fontFamily:C.font,marginBottom:10,textTransform:"uppercase",fontWeight:700}}>{label}</div>
+      <div style={{color:color||C.text1,fontFamily:C.font,fontSize:36,fontWeight:900,lineHeight:1,letterSpacing:"-0.02em",marginBottom:10}}>{value}</div>
+      <div style={{display:"flex",alignItems:"center",gap:5}}>
+        <span style={{color:positive?C.success:C.danger,fontSize:13,fontWeight:800}}>{positive?"↑":"↓"}</span>
+        <span style={{color:positive?C.success:C.danger,fontSize:12,fontFamily:C.font,fontWeight:700}}>{delta}</span>
+        <span style={{color:C.text3,fontSize:11,fontFamily:C.fontBody}}>vs mês anterior</span>
+      </div>
+      <div style={{position:"absolute",top:-20,right:-20,width:80,height:80,background:`radial-gradient(circle,${color||C.accent}15 0%,transparent 70%)`}}/>
+    </div>
+  );
+}
+
 const CustomTooltip=({active,payload,label})=>{
   if(!active||!payload?.length)return null;
   return(
@@ -268,16 +338,16 @@ function ProjectCard({project,tasks,onProjStatus,onProjPriority,onTaskToggle,onA
       {/* Tasks */}
       <div style={{display:"flex",flexDirection:"column",gap:2}}>
         {projTasks.map(task=>{
-          const done=task.status==="concluido";
+          const isDone=task.status==="concluido";
           return(
             <div key={task.id} style={{display:"flex",alignItems:"center",gap:8,padding:"4px 6px",borderRadius:8,transition:"background 0.1s",cursor:"default"}}
               onMouseEnter={e=>e.currentTarget.style.background=C.card}
               onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
               <button onClick={()=>onTaskToggle(task.id)}
-                style={{width:16,height:16,borderRadius:5,border:`1.5px solid ${done?C.success:C.border}`,background:done?C.success:C.card,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",flexShrink:0,transition:"all 0.15s"}}>
-                {done&&<span style={{color:"#080808",fontSize:9,fontWeight:900,lineHeight:1}}>✓</span>}
+                style={{width:16,height:16,borderRadius:5,border:`1.5px solid ${isDone?C.success:C.border}`,background:isDone?C.success:C.card,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",flexShrink:0,transition:"all 0.15s"}}>
+                {isDone&&<span style={{color:"#080808",fontSize:9,fontWeight:900,lineHeight:1}}>✓</span>}
               </button>
-              <span style={{color:done?C.text3:C.text2,fontSize:12,fontFamily:C.fontBody,flex:1,textDecoration:done?"line-through":"none",transition:"color 0.15s"}}>{task.title}</span>
+              <span style={{color:isDone?C.text3:C.text2,fontSize:12,fontFamily:C.fontBody,flex:1,textDecoration:isDone?"line-through":"none",transition:"color 0.15s"}}>{task.title}</span>
               {task.assignee&&<span style={{color:C.text3,fontSize:10,fontFamily:C.font,fontWeight:600,flexShrink:0}}>{task.assignee}</span>}
             </div>
           );
@@ -482,33 +552,304 @@ function CalendarView({content}){
   );
 }
 
+/* ─── ANALYTICS VIEW ─── */
+function AnalyticsView(){
+  return(
+    <div>
+      {/* 4 Metric Cards */}
+      <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:16,marginBottom:28}}>
+        <MetricCard label="Impressões"   value="2.1M"    delta="12.4%"  positive={true}  color={C.accent}/>
+        <MetricCard label="Engajamento"  value="6.73%"   delta="0.33pp" positive={true}  color="#C084FC"/>
+        <MetricCard label="Seguidores"   value="+847"    delta="8.7%"   positive={true}  color={C.info}/>
+        <MetricCard label="Alcance"      value="1.4M"    delta="5.2%"   positive={true}  color="#F59E0B"/>
+      </div>
+
+      {/* Charts grid 2x2 */}
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginBottom:16}}>
+        {/* Crescimento de seguidores */}
+        <div className="glass" style={{borderRadius:18,padding:22}}>
+          <div style={{color:C.text2,fontSize:10,letterSpacing:"0.12em",fontFamily:C.font,fontWeight:700,marginBottom:6,textTransform:"uppercase"}}>Crescimento de Seguidores</div>
+          <div style={{color:C.text1,fontFamily:C.font,fontSize:20,fontWeight:900,marginBottom:16}}>49.8K</div>
+          <ResponsiveContainer width="100%" height={160}>
+            <AreaChart data={followerGrowth}>
+              <defs>
+                <linearGradient id="fgGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor={C.accent} stopOpacity={0.35}/>
+                  <stop offset="100%" stopColor={C.accent} stopOpacity={0}/>
+                </linearGradient>
+              </defs>
+              <XAxis dataKey="m" tick={{fill:C.text3,fontSize:11,fontFamily:C.font}} axisLine={false} tickLine={false}/>
+              <YAxis tick={{fill:C.text3,fontSize:11,fontFamily:C.font}} axisLine={false} tickLine={false} tickFormatter={v=>`${(v/1000).toFixed(0)}K`}/>
+              <Tooltip content={<CustomTooltip/>} formatter={v=>[`${(v/1000).toFixed(1)}K`,"Seguidores"]}/>
+              <Area type="monotone" dataKey="v" name="Seguidores" stroke={C.accent} strokeWidth={2} fill="url(#fgGrad)" dot={false} activeDot={{r:4,fill:C.accent}}/>
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Taxa de Engajamento */}
+        <div className="glass" style={{borderRadius:18,padding:22}}>
+          <div style={{color:C.text2,fontSize:10,letterSpacing:"0.12em",fontFamily:C.font,fontWeight:700,marginBottom:6,textTransform:"uppercase"}}>Taxa de Engajamento</div>
+          <div style={{color:"#C084FC",fontFamily:C.font,fontSize:20,fontWeight:900,marginBottom:16}}>6.73%</div>
+          <ResponsiveContainer width="100%" height={160}>
+            <LineChart data={engagementRate}>
+              <XAxis dataKey="m" tick={{fill:C.text3,fontSize:11,fontFamily:C.font}} axisLine={false} tickLine={false}/>
+              <YAxis tick={{fill:C.text3,fontSize:11,fontFamily:C.font}} axisLine={false} tickLine={false} tickFormatter={v=>`${v}%`}/>
+              <Tooltip content={<CustomTooltip/>} formatter={v=>[`${v}%`,"Engajamento"]}/>
+              <Line type="monotone" dataKey="v" name="Engajamento" stroke="#C084FC" strokeWidth={2.5} dot={{fill:"#C084FC",r:3}} activeDot={{r:5}}/>
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Impressões por Dia */}
+        <div className="glass" style={{borderRadius:18,padding:22,gridColumn:"1/-1"}}>
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:6}}>
+            <div>
+              <div style={{color:C.text2,fontSize:10,letterSpacing:"0.12em",fontFamily:C.font,fontWeight:700,textTransform:"uppercase"}}>Impressões por Dia</div>
+              <div style={{color:C.text1,fontFamily:C.font,fontSize:20,fontWeight:900,marginTop:4}}>Últimos 7 dias</div>
+            </div>
+            <div style={{display:"flex",gap:16,alignItems:"center"}}>
+              {[{label:"Instagram",color:"#E1306C"},{label:"YouTube",color:"#FF0000"},{label:"LinkedIn",color:"#0A66C2"}].map(l=>(
+                <div key={l.label} style={{display:"flex",alignItems:"center",gap:6}}>
+                  <div style={{width:8,height:8,borderRadius:2,background:l.color}}/>
+                  <span style={{color:C.text2,fontSize:11,fontFamily:C.font}}>{l.label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <ResponsiveContainer width="100%" height={180}>
+            <BarChart data={impressionsDaily} barGap={3}>
+              <XAxis dataKey="d" tick={{fill:C.text3,fontSize:11,fontFamily:C.font}} axisLine={false} tickLine={false}/>
+              <YAxis tick={{fill:C.text3,fontSize:11,fontFamily:C.font}} axisLine={false} tickLine={false} tickFormatter={v=>`${(v/1000).toFixed(0)}K`}/>
+              <Tooltip content={<CustomTooltip/>} formatter={(v,n)=>[`${(v/1000).toFixed(1)}K`,n]}/>
+              <Bar dataKey="ig" name="Instagram" fill="#E1306C" radius={[4,4,0,0]}/>
+              <Bar dataKey="yt" name="YouTube"   fill="#FF0000" radius={[4,4,0,0]}/>
+              <Bar dataKey="li" name="LinkedIn"  fill="#0A66C2" radius={[4,4,0,0]}/>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* Top Posts */}
+      <div className="glass" style={{borderRadius:18,padding:22}}>
+        <div style={{color:C.text2,fontSize:10,letterSpacing:"0.12em",fontFamily:C.font,fontWeight:700,marginBottom:18,textTransform:"uppercase"}}>Posts com Melhor Desempenho</div>
+        <div style={{display:"flex",flexDirection:"column",gap:10}}>
+          {topPosts.map((post,i)=>(
+            <div key={post.id} className="card-animate" style={{display:"flex",alignItems:"center",gap:16,background:C.card,borderRadius:14,padding:"14px 18px",border:`1px solid ${C.border}`,transition:"all 0.2s"}}
+              onMouseEnter={e=>{e.currentTarget.style.borderColor=post.color+"44";e.currentTarget.style.background=C.cardHi;}}
+              onMouseLeave={e=>{e.currentTarget.style.borderColor=C.border;e.currentTarget.style.background=C.card;}}>
+              <div style={{width:28,height:28,borderRadius:8,background:`${post.color}20`,border:`1px solid ${post.color}40`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+                <span style={{color:post.color,fontFamily:C.font,fontSize:11,fontWeight:900}}>#{i+1}</span>
+              </div>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{color:C.text1,fontFamily:C.font,fontSize:13,fontWeight:800,marginBottom:3}}>{post.title}</div>
+                <div style={{display:"flex",alignItems:"center",gap:8}}>
+                  <span style={{background:`${post.color}20`,color:post.color,fontSize:10,fontWeight:800,padding:"2px 8px",borderRadius:6,fontFamily:C.font}}>{post.platform}</span>
+                  <span style={{color:C.text3,fontSize:11,fontFamily:C.fontBody}}>{post.type}</span>
+                </div>
+              </div>
+              <div style={{textAlign:"right",flexShrink:0}}>
+                <div style={{color:C.text1,fontFamily:C.font,fontSize:13,fontWeight:800}}>{post.impressions}</div>
+                <div style={{color:C.text3,fontSize:10,fontFamily:C.fontBody}}>impressões</div>
+              </div>
+              <div style={{textAlign:"right",flexShrink:0,minWidth:60}}>
+                <div style={{color:C.accent,fontFamily:C.font,fontSize:13,fontWeight:800}}>{post.engagement}</div>
+                <div style={{color:C.text3,fontSize:10,fontFamily:C.fontBody}}>engajamento</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─── COMPETITORS VIEW ─── */
+function CompetitorsView({competitors,onAdd}){
+  const getPlatformColor=(p)=>{
+    if(p==="instagram")return"#E1306C";
+    if(p==="youtube")return"#FF0000";
+    if(p==="tiktok")return"#69C9D0";
+    if(p==="linkedin")return"#0A66C2";
+    return C.accent;
+  };
+  const getPlatformLabel=(p)=>{
+    if(p==="instagram")return"Instagram";
+    if(p==="youtube")return"YouTube";
+    if(p==="tiktok")return"TikTok";
+    if(p==="linkedin")return"LinkedIn";
+    return p;
+  };
+
+  return(
+    <div>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))",gap:16}}>
+        {competitors.map(comp=>{
+          const plColor=getPlatformColor(comp.platform);
+          return(
+            <div key={comp.id} className="glass card-animate" style={{borderRadius:18,padding:20,transition:"all 0.25s",position:"relative",overflow:"hidden"}}
+              onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-3px)";e.currentTarget.style.boxShadow=`0 0 28px ${plColor}14,0 16px 40px rgba(0,0,0,0.5)`;}}
+              onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="";}}>
+              {/* Glow accent */}
+              <div style={{position:"absolute",top:-20,right:-20,width:80,height:80,background:`radial-gradient(circle,${plColor}15 0%,transparent 70%)`}}/>
+
+              {/* Header */}
+              <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",marginBottom:14}}>
+                <div>
+                  <div style={{color:C.text1,fontFamily:C.font,fontSize:15,fontWeight:900,marginBottom:4}}>{comp.name}</div>
+                  <span style={{background:`${plColor}20`,color:plColor,fontSize:10,fontWeight:800,padding:"3px 10px",borderRadius:7,fontFamily:C.font}}>{getPlatformLabel(comp.platform)}</span>
+                </div>
+                <div style={{textAlign:"right"}}>
+                  <div style={{color:comp.growthPositive?C.success:C.danger,fontFamily:C.font,fontSize:14,fontWeight:900,display:"flex",alignItems:"center",gap:4,justifyContent:"flex-end"}}>
+                    <span>{comp.growthPositive?"↑":"↓"}</span>
+                    <span>{comp.growth}</span>
+                  </div>
+                  <div style={{color:C.text3,fontSize:10,fontFamily:C.fontBody}}>crescimento</div>
+                </div>
+              </div>
+
+              {/* Stats grid */}
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
+                <div style={{background:C.card,borderRadius:12,padding:"10px 14px"}}>
+                  <div style={{color:C.text1,fontFamily:C.font,fontSize:16,fontWeight:900}}>{comp.followers}</div>
+                  <div style={{color:C.text3,fontSize:10,fontFamily:C.fontBody,marginTop:2}}>seguidores</div>
+                </div>
+                <div style={{background:C.card,borderRadius:12,padding:"10px 14px"}}>
+                  <div style={{color:C.accent,fontFamily:C.font,fontSize:16,fontWeight:900}}>{comp.engagement}</div>
+                  <div style={{color:C.text3,fontSize:10,fontFamily:C.fontBody,marginTop:2}}>engajamento</div>
+                </div>
+                <div style={{background:C.card,borderRadius:12,padding:"10px 14px",gridColumn:"1/-1",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+                  <div style={{color:C.text2,fontSize:11,fontFamily:C.fontBody}}>Posts por semana</div>
+                  <div style={{color:C.text1,fontFamily:C.font,fontSize:14,fontWeight:900}}>{comp.postsPerWeek}</div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+
+        {/* Add new card */}
+        <button onClick={onAdd}
+          style={{borderRadius:18,border:`1px dashed ${C.border}`,background:"transparent",padding:20,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:10,cursor:"pointer",minHeight:180,transition:"all 0.2s"}}
+          onMouseEnter={e=>{e.currentTarget.style.borderColor=C.accent;e.currentTarget.style.background=`${C.accent}08`;}}
+          onMouseLeave={e=>{e.currentTarget.style.borderColor=C.border;e.currentTarget.style.background="transparent";}}>
+          <div style={{width:40,height:40,borderRadius:12,border:`1px dashed ${C.border}`,display:"flex",alignItems:"center",justifyContent:"center",color:C.text3,fontSize:20}}>+</div>
+          <span style={{color:C.text3,fontFamily:C.font,fontSize:12,fontWeight:700}}>Adicionar Concorrente</span>
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ─── NEWS VIEW ─── */
+function NewsView({news,onToggleRead}){
+  const [catFilter,setCatFilter]=useState("all");
+
+  const filtered=catFilter==="all"?news:news.filter(n=>n.category===catFilter);
+  const unreadCount=news.filter(n=>!n.read).length;
+
+  return(
+    <div>
+      {/* Filter bar */}
+      <div style={{display:"flex",gap:8,marginBottom:24,flexWrap:"wrap",alignItems:"center"}}>
+        {NEWS_CATS.map(cat=>{
+          const active=catFilter===cat.id;
+          return(
+            <button key={cat.id} onClick={()=>setCatFilter(cat.id)}
+              style={{padding:"6px 16px",borderRadius:10,fontSize:12,fontWeight:700,fontFamily:C.font,border:`1px solid ${active?cat.color:C.border}`,background:active?`${cat.color}18`:"transparent",color:active?cat.color:C.text2,cursor:"pointer",transition:"all 0.15s"}}>
+              {cat.label}
+            </button>
+          );
+        })}
+        {unreadCount>0&&(
+          <div style={{marginLeft:"auto",background:`${C.accent}18`,border:`1px solid ${C.accent}30`,borderRadius:10,padding:"6px 14px",display:"flex",alignItems:"center",gap:6}}>
+            <div style={{width:6,height:6,borderRadius:"50%",background:C.accent}}/>
+            <span style={{color:C.accent,fontFamily:C.font,fontSize:12,fontWeight:700}}>{unreadCount} não lidas</span>
+          </div>
+        )}
+      </div>
+
+      {/* News grid */}
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(320px,1fr))",gap:14}}>
+        {filtered.map(item=>{
+          const cat=NEWS_CATS.find(c=>c.id===item.category)||NEWS_CATS[0];
+          return(
+            <div key={item.id} className="glass card-animate"
+              style={{borderRadius:16,padding:18,transition:"all 0.25s",position:"relative",opacity:item.read?0.7:1,borderLeft:!item.read?`3px solid ${C.accent}`:"3px solid transparent"}}
+              onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.opacity="1";e.currentTarget.style.boxShadow="0 12px 32px rgba(0,0,0,0.5)";}}
+              onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.opacity=item.read?"0.7":"1";e.currentTarget.style.boxShadow="";}}>
+
+              {/* Unread dot */}
+              {!item.read&&(
+                <div style={{position:"absolute",top:14,right:14,width:7,height:7,borderRadius:"50%",background:C.accent,boxShadow:`0 0 6px ${C.accent}`}}/>
+              )}
+
+              {/* Category + date */}
+              <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
+                <span style={{background:`${cat.color}20`,color:cat.color,fontSize:10,fontWeight:800,padding:"3px 9px",borderRadius:7,fontFamily:C.font}}>{cat.label}</span>
+                <span style={{color:C.text3,fontSize:11,fontFamily:C.fontBody,marginLeft:"auto"}}>{item.date}</span>
+              </div>
+
+              {/* Title */}
+              <div style={{color:C.text1,fontFamily:C.font,fontSize:13,fontWeight:800,lineHeight:1.4,marginBottom:10}}>{item.title}</div>
+
+              {/* Source + action */}
+              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+                <span style={{color:C.text3,fontSize:11,fontFamily:C.fontBody}}>{item.source}</span>
+                <button onClick={()=>onToggleRead(item.id)}
+                  style={{background:"transparent",border:`1px solid ${C.border}`,borderRadius:8,padding:"4px 12px",color:item.read?C.text3:C.accent,fontSize:11,fontFamily:C.font,fontWeight:700,cursor:"pointer",transition:"all 0.15s"}}
+                  onMouseEnter={e=>{e.currentTarget.style.borderColor=C.borderHi;}}
+                  onMouseLeave={e=>{e.currentTarget.style.borderColor=C.border;}}>
+                  {item.read?"Lida":"Marcar lida"}
+                </button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 /* ─── APP ─── */
 export default function App(){
-  const [view,     setView]     =useState("overview");
-  const [projects, setProjects] =useState(iProjects);
-  const [tasks,    setTasks]    =useState(iTasks);
-  const [content,  setContent]  =useState(iContent);
-  const [col,      setCol]      =useState(false);
-  const [modal,    setModal]    =useState(null);
-  const [form,     setForm]     =useState({});
+  const [view,        setView]        =useState("overview");
+  const [projects,    setProjects]    =useState(iProjects);
+  const [tasks,       setTasks]       =useState(iTasks);
+  const [content,     setContent]     =useState(iContent);
+  const [competitors, setCompetitors] =useState(iCompetitors);
+  const [news,        setNews]        =useState(iNews);
+  const [col,         setCol]         =useState(false);
+  const [modal,       setModal]       =useState(null);
+  const [form,        setForm]        =useState({});
 
   const setPSt =(id,s)=>setProjects(ps=>ps.map(p=>p.id===id?{...p,status:s}:p));
   const setPPr =(id,p)=>setProjects(ps=>ps.map(pr=>pr.id===id?{...pr,priority:p}:pr));
   const setCSt =(id,s)=>setContent(cs=>cs.map(c=>c.id===id?{...c,status:s}:c));
 
   const toggleTask=id=>setTasks(ts=>ts.map(t=>t.id===id?{...t,status:t.status==="concluido"?"andamento":"concluido"}:t));
+  const toggleRead=id=>setNews(ns=>ns.map(n=>n.id===id?{...n,read:!n.read}:n));
 
   const openModal=(type,defaultStatus)=>{
     setModal(type);
-    if(type==="project") setForm({name:"",client:"",status:defaultStatus||"backlog",priority:"normal",deadline:"",desc:""});
-    else if(type==="task") setForm({title:"",projectId:defaultStatus||projects[0]?.id||1,assignee:"",status:"backlog",priority:"normal",deadline:""});
-    else setForm({title:"",platform:"instagram",type:"feed",status:defaultStatus||"ideia",date:"",caption:""});
+    if(type==="project")      setForm({name:"",client:"",status:defaultStatus||"backlog",priority:"normal",deadline:"",desc:""});
+    else if(type==="task")    setForm({title:"",projectId:defaultStatus||projects[0]?.id||1,assignee:"",status:"backlog",priority:"normal",deadline:""});
+    else if(type==="content") setForm({title:"",platform:"instagram",type:"feed",status:defaultStatus||"ideia",date:"",caption:""});
+    else if(type==="competitor") setForm({name:"",platform:"instagram",handle:""});
   };
 
   const submitModal=()=>{
-    if(modal==="project") setProjects(ps=>[...ps,{...form,id:nPid++,name:form.name||"Novo Projeto"}]);
-    else if(modal==="task") setTasks(ts=>[...ts,{...form,id:nTid++,title:form.title||"Nova Tarefa",projectId:Number(form.projectId)}]);
-    else setContent(cs=>[...cs,{...form,id:nCid++,title:form.title||"Novo Conteúdo"}]);
+    if(modal==="project")          setProjects(ps=>[...ps,{...form,id:nPid++,name:form.name||"Novo Projeto"}]);
+    else if(modal==="task")        setTasks(ts=>[...ts,{...form,id:nTid++,title:form.title||"Nova Tarefa",projectId:Number(form.projectId)}]);
+    else if(modal==="content")     setContent(cs=>[...cs,{...form,id:nCid++,title:form.title||"Novo Conteúdo"}]);
+    else if(modal==="competitor")  setCompetitors(cs=>[...cs,{
+      id:nCompId++,
+      name:form.handle?`@${form.handle.replace(/^@/,"")}`:form.name||"Novo Concorrente",
+      platform:form.platform||"instagram",
+      followers:"0",
+      engagement:"0%",
+      postsPerWeek:0,
+      growth:"+0%",
+      growthPositive:true,
+    }]);
     setModal(null);
   };
 
@@ -524,12 +865,16 @@ export default function App(){
   }),[projects,tasks,content]);
 
   const nav=[
-    {id:"overview",  icon:"◈", label:"Visão Geral"},
-    {id:"projects",  icon:"⬡", label:"Projetos"},
-    {id:"content",   icon:"✦", label:"Conteúdo"},
-    {id:"calendar",  icon:"▦", label:"Calendário"},
-    {id:"analytics", icon:"▲", label:"Analytics"},
+    {id:"overview",     icon:"◈", label:"Visão Geral"},
+    {id:"projects",     icon:"⬡", label:"Projetos"},
+    {id:"content",      icon:"✦", label:"Conteúdo"},
+    {id:"calendar",     icon:"▦", label:"Calendário"},
+    {id:"analytics",    icon:"▲", label:"Analytics"},
+    {id:"competitors",  icon:"◉", label:"Concorrentes"},
+    {id:"news",         icon:"◫", label:"Notícias"},
   ];
+
+  const unreadNews=news.filter(n=>!n.read).length;
 
   return(
     <div style={{background:C.bg,color:C.text1,fontFamily:C.fontBody,display:"flex",height:"100vh",overflow:"hidden",position:"relative"}}>
@@ -553,11 +898,17 @@ export default function App(){
         <nav style={{flex:1,padding:"10px 8px",display:"flex",flexDirection:"column",gap:2}}>
           {nav.map(item=>{
             const active=view===item.id;
+            const showBadge=item.id==="news"&&unreadNews>0;
             return(
               <button key={item.id} onClick={()=>setView(item.id)}
-                style={{background:active?C.accentDim:"transparent",color:active?C.accent:C.text2,fontFamily:C.font,width:"100%",display:"flex",alignItems:"center",gap:10,padding:col?"10px 0":"9px 14px",justifyContent:col?"center":"flex-start",borderRadius:12,fontSize:13,fontWeight:active?800:600,cursor:"pointer",border:"none",borderLeft:active&&!col?`2px solid ${C.accent}`:"2px solid transparent",transition:"all 0.15s"}}>
+                style={{background:active?C.accentDim:"transparent",color:active?C.accent:C.text2,fontFamily:C.font,width:"100%",display:"flex",alignItems:"center",gap:10,padding:col?"10px 0":"9px 14px",justifyContent:col?"center":"flex-start",borderRadius:12,fontSize:13,fontWeight:active?800:600,cursor:"pointer",border:"none",borderLeft:active&&!col?`2px solid ${C.accent}`:"2px solid transparent",transition:"all 0.15s",position:"relative"}}>
                 <span style={{fontSize:14}}>{item.icon}</span>
                 {!col&&<span>{item.label}</span>}
+                {showBadge&&(
+                  <span style={{marginLeft:"auto",background:C.accent,color:"#060606",fontFamily:C.font,fontSize:9,fontWeight:900,padding:"2px 6px",borderRadius:99,minWidth:18,textAlign:"center"}}>
+                    {unreadNews}
+                  </span>
+                )}
               </button>
             );
           })}
@@ -585,6 +936,12 @@ export default function App(){
               + Novo Projeto
             </button>
           )}
+          {view==="competitors"&&(
+            <button className="glow-btn" onClick={()=>openModal("competitor")}
+              style={{fontFamily:C.font,fontWeight:900,fontSize:12,padding:"9px 20px",borderRadius:12,border:"none",cursor:"pointer",letterSpacing:"0.02em"}}>
+              + Adicionar Concorrente
+            </button>
+          )}
         </div>
 
         <div style={{padding:28}}>
@@ -601,24 +958,31 @@ export default function App(){
               <StatCard label="Conteúdos"      value={stats.ctotal}    accent="#E1306C"   chart/>
               <StatCard label="Agendados"      value={stats.scheduled} accent={C.accent}  chart/>
             </div>
-            <div style={{display:"grid",gridTemplateColumns:"2fr 1fr",gap:16,marginBottom:16}}>
-              <div className="glass" style={{borderRadius:18,padding:22}}>
-                <div style={{color:C.text2,fontSize:10,letterSpacing:"0.12em",fontFamily:C.font,fontWeight:700,marginBottom:16,textTransform:"uppercase"}}>Projetos / mês</div>
-                <ResponsiveContainer width="100%" height={160}>
-                  <AreaChart data={revenueData}>
-                    <defs><linearGradient id="aG" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor={C.accent} stopOpacity={0.3}/>
-                      <stop offset="100%" stopColor={C.accent} stopOpacity={0}/>
-                    </linearGradient></defs>
-                    <XAxis dataKey="m" tick={{fill:C.text3,fontSize:11,fontFamily:C.font}} axisLine={false} tickLine={false}/>
-                    <YAxis tick={{fill:C.text3,fontSize:11,fontFamily:C.font}} axisLine={false} tickLine={false}/>
-                    <Tooltip content={<CustomTooltip/>}/>
-                    <Area type="monotone" dataKey="v" name="Projetos" stroke={C.accent} strokeWidth={2} fill="url(#aG)" dot={false}/>
-                  </AreaChart>
-                </ResponsiveContainer>
+
+            {/* Analytics highlight */}
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginBottom:16}}>
+              <div className="glass" style={{borderRadius:18,padding:22,display:"flex",alignItems:"center",gap:20}}>
+                <div style={{flex:1}}>
+                  <div style={{color:C.text2,fontSize:10,letterSpacing:"0.12em",fontFamily:C.font,fontWeight:700,marginBottom:6,textTransform:"uppercase"}}>Impressões (mês)</div>
+                  <div style={{color:C.accent,fontFamily:C.font,fontSize:38,fontWeight:900,letterSpacing:"-0.03em",lineHeight:1}}>2.1M</div>
+                  <div style={{display:"flex",alignItems:"center",gap:5,marginTop:8}}>
+                    <span style={{color:C.success,fontSize:12,fontWeight:800}}>↑ 12.4%</span>
+                    <span style={{color:C.text3,fontSize:11,fontFamily:C.fontBody}}>vs mês anterior</span>
+                  </div>
+                </div>
+                <div style={{width:1,height:60,background:C.border}}/>
+                <div style={{flex:1}}>
+                  <div style={{color:C.text2,fontSize:10,letterSpacing:"0.12em",fontFamily:C.font,fontWeight:700,marginBottom:6,textTransform:"uppercase"}}>Engajamento</div>
+                  <div style={{color:"#C084FC",fontFamily:C.font,fontSize:38,fontWeight:900,letterSpacing:"-0.03em",lineHeight:1}}>6.73%</div>
+                  <div style={{display:"flex",alignItems:"center",gap:5,marginTop:8}}>
+                    <span style={{color:C.success,fontSize:12,fontWeight:800}}>↑ 0.33pp</span>
+                    <span style={{color:C.text3,fontSize:11,fontFamily:C.fontBody}}>vs mês anterior</span>
+                  </div>
+                </div>
               </div>
+
               <div className="glass" style={{borderRadius:18,padding:22}}>
-                <div style={{color:C.text2,fontSize:10,letterSpacing:"0.12em",fontFamily:C.font,fontWeight:700,marginBottom:14,textTransform:"uppercase"}}>Por Categoria</div>
+                <div style={{color:C.text2,fontSize:10,letterSpacing:"0.12em",fontFamily:C.font,fontWeight:700,marginBottom:16,textTransform:"uppercase"}}>Por Categoria</div>
                 <ResponsiveContainer width="100%" height={130}>
                   <PieChart>
                     <Pie data={pieData} cx="50%" cy="50%" innerRadius={40} outerRadius={58} paddingAngle={4} dataKey="value">
@@ -640,21 +1004,25 @@ export default function App(){
                 </div>
               </div>
             </div>
+
             <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:18,padding:22}}>
-              <div style={{color:C.text2,fontSize:10,letterSpacing:"0.12em",fontFamily:C.font,fontWeight:700,marginBottom:16,textTransform:"uppercase"}}>Tarefas — Concluídas vs Abertas</div>
+              <div style={{color:C.text2,fontSize:10,letterSpacing:"0.12em",fontFamily:C.font,fontWeight:700,marginBottom:16,textTransform:"uppercase"}}>Projetos / mês</div>
               <ResponsiveContainer width="100%" height={160}>
-                <BarChart data={taskData} barGap={4}>
+                <AreaChart data={revenueData}>
+                  <defs><linearGradient id="aG" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor={C.accent} stopOpacity={0.3}/>
+                    <stop offset="100%" stopColor={C.accent} stopOpacity={0}/>
+                  </linearGradient></defs>
                   <XAxis dataKey="m" tick={{fill:C.text3,fontSize:11,fontFamily:C.font}} axisLine={false} tickLine={false}/>
                   <YAxis tick={{fill:C.text3,fontSize:11,fontFamily:C.font}} axisLine={false} tickLine={false}/>
                   <Tooltip content={<CustomTooltip/>}/>
-                  <Bar dataKey="c" name="Concluídas" fill={C.accent} radius={[5,5,0,0]}/>
-                  <Bar dataKey="a" name="Abertas"    fill="#222"    radius={[5,5,0,0]}/>
-                </BarChart>
+                  <Area type="monotone" dataKey="v" name="Projetos" stroke={C.accent} strokeWidth={2} fill="url(#aG)" dot={false}/>
+                </AreaChart>
               </ResponsiveContainer>
             </div>
           </>}
 
-          {/* ── PROJECTS (com tarefas integradas) ── */}
+          {/* ── PROJECTS ── */}
           {view==="projects"&&(
             <ProjectKanban
               projects={projects} tasks={tasks}
@@ -671,59 +1039,26 @@ export default function App(){
           {view==="calendar"&&<CalendarView content={content}/>}
 
           {/* ── ANALYTICS ── */}
-          {view==="analytics"&&<>
-            <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:16,marginBottom:24}}>
-              <StatCard label="Proj. este mês" value="6"   accent={C.accent}  chart/>
-              <StatCard label="Taxa conclusão" value="84%" accent={C.success} chart/>
-              <StatCard label="Em atraso"      value="2"   accent={C.danger}  chart/>
-            </div>
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}}>
-              <div className="glass" style={{borderRadius:18,padding:22}}>
-                <div style={{color:C.text2,fontSize:10,letterSpacing:"0.12em",fontFamily:C.font,fontWeight:700,marginBottom:16,textTransform:"uppercase"}}>Crescimento Mensal</div>
-                <ResponsiveContainer width="100%" height={180}>
-                  <LineChart data={revenueData}>
-                    <XAxis dataKey="m" tick={{fill:C.text3,fontSize:11,fontFamily:C.font}} axisLine={false} tickLine={false}/>
-                    <YAxis tick={{fill:C.text3,fontSize:11,fontFamily:C.font}} axisLine={false} tickLine={false}/>
-                    <Tooltip content={<CustomTooltip/>}/>
-                    <Line type="monotone" dataKey="v" name="Projetos" stroke={C.accent} strokeWidth={2} dot={{fill:C.accent,r:3}} activeDot={{r:5}}/>
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-              <div className="glass" style={{borderRadius:18,padding:22}}>
-                <div style={{color:C.text2,fontSize:10,letterSpacing:"0.12em",fontFamily:C.font,fontWeight:700,marginBottom:16,textTransform:"uppercase"}}>Distribuição de Tasks</div>
-                <ResponsiveContainer width="100%" height={180}>
-                  <BarChart data={taskData}>
-                    <XAxis dataKey="m" tick={{fill:C.text3,fontSize:11,fontFamily:C.font}} axisLine={false} tickLine={false}/>
-                    <YAxis tick={{fill:C.text3,fontSize:11,fontFamily:C.font}} axisLine={false} tickLine={false}/>
-                    <Tooltip content={<CustomTooltip/>}/>
-                    <Bar dataKey="c" name="Concluídas" fill={C.accent}  radius={[5,5,0,0]}/>
-                    <Bar dataKey="a" name="Abertas"    fill="#C084FC"   radius={[5,5,0,0]}/>
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-              <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:18,padding:22,gridColumn:"1/-1"}}>
-                <div style={{color:C.text2,fontSize:10,letterSpacing:"0.12em",fontFamily:C.font,fontWeight:700,marginBottom:16,textTransform:"uppercase"}}>Projetos por Status</div>
-                <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
-                  {STATUSES.map(s=>{
-                    const count=projects.filter(p=>p.status===s.id).length;
-                    return(
-                      <div key={s.id} style={{background:s.bg,border:`1px solid ${s.color}20`,borderRadius:12,padding:"12px 18px",minWidth:100}}>
-                        <div style={{color:s.color,fontFamily:C.font,fontSize:24,fontWeight:900,letterSpacing:"-0.02em"}}>{count}</div>
-                        <div style={{color:s.color,opacity:0.65,fontSize:10,marginTop:3,fontFamily:C.font,fontWeight:700}}>{s.label}</div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          </>}
+          {view==="analytics"&&<AnalyticsView/>}
+
+          {/* ── COMPETITORS ── */}
+          {view==="competitors"&&<CompetitorsView competitors={competitors} onAdd={()=>openModal("competitor")}/>}
+
+          {/* ── NEWS ── */}
+          {view==="news"&&<NewsView news={news} onToggleRead={toggleRead}/>}
 
         </div>
       </main>
 
       {/* ── MODAL ── */}
       {modal&&(
-        <Modal title={modal==="project"?"Novo Projeto":modal==="task"?"Nova Tarefa":"Novo Conteúdo"} onClose={()=>setModal(null)}>
+        <Modal
+          title={
+            modal==="project"    ?"Novo Projeto"       :
+            modal==="task"       ?"Nova Tarefa"        :
+            modal==="content"    ?"Novo Conteúdo"      :
+            modal==="competitor" ?"Adicionar Concorrente":""}
+          onClose={()=>setModal(null)}>
 
           {modal==="project"&&<>
             <Field label="Nome do projeto"><input style={inputSt} value={form.name||""} onChange={e=>setForm(f=>({...f,name:e.target.value}))} placeholder="Ex: Campanha Verão 2026" onFocus={e=>e.target.style.borderColor=C.borderHi} onBlur={e=>e.target.style.borderColor=C.border}/></Field>
@@ -760,9 +1095,17 @@ export default function App(){
             <Field label="Legenda"><textarea style={{...inputSt,resize:"vertical",minHeight:80}} value={form.caption||""} onChange={e=>setForm(f=>({...f,caption:e.target.value}))} placeholder="Escreva a legenda aqui..." onFocus={e=>e.target.style.borderColor=C.borderHi} onBlur={e=>e.target.style.borderColor=C.border}/></Field>
           </>}
 
+          {modal==="competitor"&&<>
+            <Field label="Nome / Marca"><input style={inputSt} value={form.name||""} onChange={e=>setForm(f=>({...f,name:e.target.value}))} placeholder="Ex: Agência X" onFocus={e=>e.target.style.borderColor=C.borderHi} onBlur={e=>e.target.style.borderColor=C.border}/></Field>
+            <Field label="Plataforma"><select style={{...inputSt,cursor:"pointer"}} value={form.platform||"instagram"} onChange={e=>setForm(f=>({...f,platform:e.target.value}))}>{PLATFORMS.map(p=><option key={p.id} value={p.id}>{p.label}</option>)}</select></Field>
+            <Field label="Handle / @username"><input style={inputSt} value={form.handle||""} onChange={e=>setForm(f=>({...f,handle:e.target.value}))} placeholder="Ex: agenciax (sem @)" onFocus={e=>e.target.style.borderColor=C.borderHi} onBlur={e=>e.target.style.borderColor=C.border}/></Field>
+          </>}
+
           <div style={{display:"flex",gap:10,justifyContent:"flex-end",marginTop:6}}>
             <button onClick={()=>setModal(null)} style={{padding:"10px 20px",borderRadius:12,border:`1px solid ${C.border}`,background:"transparent",color:C.text2,fontSize:13,fontFamily:C.font,fontWeight:700,cursor:"pointer",transition:"border-color 0.15s"}} onMouseEnter={e=>e.currentTarget.style.borderColor=C.borderHi} onMouseLeave={e=>e.currentTarget.style.borderColor=C.border}>Cancelar</button>
-            <button className="glow-btn" onClick={submitModal} style={{padding:"10px 22px",borderRadius:12,border:"none",fontSize:13,fontFamily:C.font,fontWeight:900,cursor:"pointer",letterSpacing:"0.01em"}}>Criar</button>
+            <button className="glow-btn" onClick={submitModal} style={{padding:"10px 22px",borderRadius:12,border:"none",fontSize:13,fontFamily:C.font,fontWeight:900,cursor:"pointer",letterSpacing:"0.01em"}}>
+              {modal==="competitor"?"Adicionar":"Criar"}
+            </button>
           </div>
         </Modal>
       )}
